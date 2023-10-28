@@ -46,6 +46,11 @@ class DocumentVerification {
       };
 
   Future<bool> validate() async {
+    
+    if (SideType.frontSide.isSelfie) {
+      return await validateOneFace();
+    }
+
     bool hasOnlyOneFace = validateOneFaceExist ? await validateOneFace() : true;
     bool hasText = await validateKeyWordsInFile(keyWords ?? defaultKeyWords);
 
