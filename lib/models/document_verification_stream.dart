@@ -40,7 +40,6 @@ class DocumentVerificationStream extends DocumentVerificationBase {
       List<Face> faces = await faceDetector.processImage(inputImage);
       return faces.length == numFaces;
     } on Exception catch (_) {
-      print('Entro al error validateFaces');
       return false;
     }
   }

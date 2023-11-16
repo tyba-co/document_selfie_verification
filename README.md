@@ -1,39 +1,76 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Document Verification Library
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+Esta biblioteca proporciona clases para la verificación de documentos usando Google Cloud Vision API.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+## Características
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+* Valida texto usando MLKit TextRecognizer
+* Valida caras usando MLKit FaceDetector
+* Soporta diferentes orientaciones: retrato, paisaje
+* Proporciona métodos para convertir CameraImage a InputImage
 
-## Features
+## Uso
+```
+import 'package:document_verification/document_verification.dart';
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+void main() {
+// Create a document verification object
+DocumentVerificationStream stream = DocumentVerificationStream(
+image: image,
+cameraDescription: cameraDescription,
+controller: controller,
+country: CountryType.colombia,
+side: SideType.frontSide,
+keyWords: ['cedula', 'pasaporte', 'licencia'],
+);
 
-## Getting started
+// Validate text
+MLTextResponse mlResponse = await stream.checkMLText();
+if (mlResponse.keyWordsValidated) {
+print('Text validated');
+} else {
+print('Text not validated');
+}
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
+// Validate faces
+bool facesValidated = await stream.validateFaces(numFaces: 1);
+if (facesValidated) {
+print('Faces validated');
+} else {
+print('Faces not validated');
+}
+}
 ```
 
-## Additional information
+## Clases
+* DocumentVerificationBase: Define la estructura básica de una clase de verificación de documentos.
+* DocumentVerificationStream: Clase que proporciona métodos adicionales para validar documentos usando Google Cloud Vision API.
+MLTextResponse: Representa la respuesta del proceso de reconocimiento de texto.
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+## Constantes
+* **frontDNIDocumentKeyWordsCO**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad colombiana.
+* **backDNIDocumentKeyWordsCO**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad colombiana.
+* **frontDNIDocumentKeyWordsCL**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad chilena.
+* **backDNIDocumentKeyWordsCL**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad chilena.
+* **frontDNIDocumentKeyWordsPE**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad peruana.
+* **backDNIDocumentKeyWordsPE**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad peruana.
+
+## Enumeraciones
+* CountryType: Representa el país de un documento.
+* SideType: Representa el lado de un documento.
+
+## Instalación
+Para instalar la biblioteca, ejecute el siguiente comando:
+
+dart pub add document_verification
+
+## Requisitos
+
+La biblioteca requiere las siguientes dependencias:
+
+* Google Mobile Vision
+* Google ML Kit
+
+## Licencia
+
+La biblioteca está licenciada bajo la licencia Apache 2.0.
