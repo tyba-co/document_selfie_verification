@@ -8,6 +8,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  camera: ^0.10.5+5
   flutter:
     sdk: flutter
   google_ml_kit: ^0.16.2
