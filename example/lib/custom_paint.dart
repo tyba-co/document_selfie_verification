@@ -18,10 +18,10 @@ class MyCustomPaint extends CustomPainter {
         Path()
           ..addRRect(
             RRect.fromLTRBR(
-              16,
-              150,
-              size.width - 16,
-              size.height / 2,
+              64,
+              32,
+              size.width - 64,
+              size.height - 32,
               const Radius.circular(10),
             ),
           )

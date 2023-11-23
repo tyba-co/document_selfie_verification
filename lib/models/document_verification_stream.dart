@@ -34,11 +34,10 @@ class DocumentVerificationStream extends DocumentVerificationBase {
     return mlResponse;
   }
 
-  Future<bool> validateFaces({int numFaces = 1}) async {
+  Future<bool> validateFaces({int maxFaces = 2}) async {
     try {
-      
       List<Face> faces = await faceDetector.processImage(inputImage);
-      return faces.length == numFaces;
+      return faces.isNotEmpty && faces.length <= maxFaces;
     } on Exception catch (_) {
       return false;
     }

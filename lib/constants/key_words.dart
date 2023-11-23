@@ -2,9 +2,9 @@ part of document_verification.constants;
 
 const List<String> frontDNIDocumentKeyWordsCO = <String>[
   'colombia',
-  'cedula',
   'republica',
-  'identificacion',
+  'cedula',
+  'apellidos',
 ];
 
 const List<String> frontDNIDocumentKeyWordsCL = <String>[

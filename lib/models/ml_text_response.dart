@@ -28,4 +28,12 @@ class MLTextResponse {
   bool get success => blocksAndKeyword.keys.every(
         (element) => blocksAndKeyword[element],
       );
+
+  bool get almostOneIsSuccess => blocksAndKeyword.keys.any(
+        (element) => blocksAndKeyword[element],
+      );
+
+  bool get dontRecognizeAnything => blocksAndKeyword.keys.every(
+        (element) => blocksAndKeyword[element] == false,
+      );
 }

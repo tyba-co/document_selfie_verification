@@ -21,7 +21,8 @@ class _CameraAppState extends State<CameraApp> {
   CameraController? controller;
   int contador = 0;
   Image? imageToShow;
-  Map<String, dynamic> errors = {};
+  String labelToShow =
+      'Todo el documento debe estar dentro del recuadro , información y foto.';
 
   @override
   void initState() {
@@ -78,10 +79,20 @@ class _CameraAppState extends State<CameraApp> {
             await documentVerificationStream.checkMLText();
         bool hasOnlyOneFace = await documentVerificationStream.validateFaces();
 
-        errors = {
-          ...checkMLText.blocksAndKeyword,
-          'hasOnlyOneFace': hasOnlyOneFace
-        };
+
+        if (checkMLText.dontRecognizeAnything) {
+          labelToShow =
+              'Todo el documento debe estar dentro del recuadro , información y foto.';
+          setState(() {});
+          return;
+        }
+
+        if (checkMLText.almostOneIsSuccess) {
+          labelToShow =
+              'Asegurate de que el documento este bien enfocado y no tenga brillos o sombras. ';
+          setState(() {});
+          return;
+        }
 
         if (checkMLText.success && hasOnlyOneFace && imageToShow == null) {
           Uint8List? imageConvert = await ConvertNativeImgStream()
@@ -128,13 +139,6 @@ class _CameraAppState extends State<CameraApp> {
     }
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          'Testing Document',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
       body: Stack(
         children: [
           SizedBox(
@@ -144,49 +148,25 @@ class _CameraAppState extends State<CameraApp> {
           ),
           if (imageToShow == null) ...<Widget>[
             CustomPaint(
-                painter: MyCustomPaint(Colors.black.withOpacity(0.4)),
+                painter: MyCustomPaint(Colors.black.withOpacity(0.6)),
                 size: Size(
                   MediaQuery.of(context).size.width,
                   MediaQuery.of(context).size.height,
                 )),
-            Positioned(
-              bottom: MediaQuery.of(context).size.height / 5,
-              left: 120,
-              child: Material(
-                color: Colors.transparent,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    ...errors.keys.map(
-                      (String mapKey) {
-                        bool isSuccess = errors[mapKey];
-
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              mapKey,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            const SizedBox(
-                              width: 16,
-                            ),
-                            Text(
-                              isSuccess ? 'success' : 'failed',
-                              style: TextStyle(
-                                color: isSuccess ? Colors.green : Colors.red,
-                              ),
-                            )
-                          ],
-                        );
-                      },
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    labelToShow,
+                    style: const TextStyle(
+                      color: Colors.white,
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            )
           ],
         ],
       ),
