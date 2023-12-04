@@ -36,6 +36,9 @@ class DocumentVerificationStream extends DocumentVerificationBase {
 
   Future<bool> validateFaces({int maxFaces = 2}) async {
     try {
+      if (side == SideType.backSide) {
+        return true;
+      }
       List<Face> faces = await faceDetector.processImage(inputImage);
       return faces.isNotEmpty && faces.length <= maxFaces;
     } on Exception catch (_) {

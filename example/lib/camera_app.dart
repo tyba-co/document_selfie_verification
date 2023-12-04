@@ -73,26 +73,14 @@ class _CameraAppState extends State<CameraApp> {
           cameraDescription: cameraDescription,
           controller: controller!,
           image: availableImage,
+          side: SideType.frontSide,
+          country: CountryType.colombia,
         );
 
         MLTextResponse checkMLText =
             await documentVerificationStream.checkMLText();
         bool hasOnlyOneFace = await documentVerificationStream.validateFaces();
 
-
-        if (checkMLText.dontRecognizeAnything) {
-          labelToShow =
-              'Todo el documento debe estar dentro del recuadro , información y foto.';
-          setState(() {});
-          return;
-        }
-
-        if (checkMLText.almostOneIsSuccess) {
-          labelToShow =
-              'Asegurate de que el documento este bien enfocado y no tenga brillos o sombras. ';
-          setState(() {});
-          return;
-        }
 
         if (checkMLText.success && hasOnlyOneFace && imageToShow == null) {
           Uint8List? imageConvert = await ConvertNativeImgStream()
@@ -108,6 +96,20 @@ class _CameraAppState extends State<CameraApp> {
           // File decodedImageFile = File('${tempDir.path}/test2.jpeg')
           //   ..writeAsBytesSync(imageConvert!);
           // filePath = decodedImageFile.path;
+        }
+
+        if (checkMLText.dontRecognizeAnything) {
+          labelToShow =
+              'Todo el documento debe estar dentro del recuadro , información y foto.';
+          setState(() {});
+          return;
+        }
+
+        if (checkMLText.almostOneIsSuccess) {
+          labelToShow =
+              'Asegurate de que el documento este bien enfocado y no tenga brillos o sombras.';
+          setState(() {});
+          return;
         }
 
         setState(() {});
@@ -132,6 +134,19 @@ class _CameraAppState extends State<CameraApp> {
     super.dispose();
   }
 
+  Future<void> onTapUp(TapUpDetails details) async {
+    double x = details.localPosition.dx;
+    double y = details.localPosition.dy;
+
+    Offset point = Offset(x, y);
+    // Manually focus
+    await controller?.setFocusPoint(point);
+
+    // Manually set light exposure
+    controller?.setExposurePoint(point);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!(controller?.value.isInitialized ?? false)) {
@@ -139,36 +154,39 @@ class _CameraAppState extends State<CameraApp> {
     }
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: imageToShow ?? CameraPreview(controller!),
-          ),
-          if (imageToShow == null) ...<Widget>[
-            CustomPaint(
-                painter: MyCustomPaint(Colors.black.withOpacity(0.6)),
-                size: Size(
-                  MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height,
-                )),
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    labelToShow,
-                    style: const TextStyle(
-                      color: Colors.white,
+      body: GestureDetector(
+        onTapUp: onTapUp,
+        child: Stack(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: imageToShow ?? CameraPreview(controller!),
+            ),
+            if (imageToShow == null) ...<Widget>[
+              CustomPaint(
+                  painter: MyCustomPaint(Colors.black.withOpacity(0.6)),
+                  size: Size(
+                    MediaQuery.of(context).size.width,
+                    MediaQuery.of(context).size.height,
+                  )),
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      labelToShow,
+                      style: const TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )
+              )
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

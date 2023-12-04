@@ -25,9 +25,14 @@ class MLTextResponse {
         },
       );
 
-  bool get success => blocksAndKeyword.keys.every(
-        (element) => blocksAndKeyword[element],
-      );
+  bool get success {
+    List<String> response = blocksAndKeyword.keys
+        .where(
+          (element) => blocksAndKeyword[element],
+        )
+        .toList();
+    return response.length >= 2;
+  }
 
   bool get almostOneIsSuccess => blocksAndKeyword.keys.any(
         (element) => blocksAndKeyword[element],

@@ -11,14 +11,13 @@ abstract class DocumentVerificationBase {
   SideType side;
 
   List<String> get defaultKeyWords => switch (country) {
-        CountryType.chile when side.isFrontSide => frontDNIDocumentKeyWordsCL,
-        CountryType.chile when side.isBackSide => backDNIDocumentKeyWordsCL,
-        CountryType.colombia when side.isFrontSide =>
-          frontDNIDocumentKeyWordsCO,
-        CountryType.colombia when side.isBackSide => backDNIDocumentKeyWordsCO,
-        CountryType.peru when side.isFrontSide => frontDNIDocumentKeyWordsPE,
-        CountryType.peru when side.isBackSide => backDNIDocumentKeyWordsPE,
-        _ => frontDNIDocumentKeyWordsCO
+        CountryType.chile when side.isFrontSide => frontDNICL,
+        CountryType.chile when side.isBackSide => backDNICL,
+        CountryType.colombia when side.isFrontSide => frontDNICO,
+        CountryType.colombia when side.isBackSide => backDNICO,
+        CountryType.peru when side.isFrontSide => frontDNIPE,
+        CountryType.peru when side.isBackSide => backDNIPE,
+        _ => throw UnimplementedError('country not found'),
       };
 
   List<String> get keyWordsToValidate => keyWords ?? defaultKeyWords;
