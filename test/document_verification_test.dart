@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-// import 'package:document_verification/document_verification.dart';
+// import 'package:document_selfie_verification/document_selfie_verification.dart';
 
 void main() {
   test('adds one to input values', () {

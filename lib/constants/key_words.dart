@@ -1,4 +1,4 @@
-part of document_verification.constants;
+part of document_selfie_verification.constants;
 
 const List<String> frontDNICO = <String>[
   'colombia',

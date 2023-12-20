@@ -129,7 +129,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
-  document_verification:
+  document_selfie_verification:
     dependency: "direct main"
     description:
       path: ".."

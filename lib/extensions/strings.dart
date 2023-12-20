@@ -1,4 +1,4 @@
-part of document_verification.extensions;
+part of document_selfie_verification.extensions;
 
 extension DiacriticsAwareString on String {
   static const diacritics =

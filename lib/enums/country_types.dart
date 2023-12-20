@@ -1,4 +1,4 @@
-part of document_verification.enums;
+part of document_selfie_verification.enums;
 
 enum CountryType {
   colombia('COLOMBIA'),

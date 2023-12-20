@@ -1,4 +1,4 @@
-import 'package:document_verification/document_verification.dart';
+import 'package:document_selfie_verification/document_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

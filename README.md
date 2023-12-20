@@ -12,7 +12,7 @@ This widget provides a comprehensive solution for capturing and verifying both d
 
 ## Usage:
 
-* **Add Dependency**: Include the document_verification package in your pubspec.yaml file.
+* **Add Dependency**: Include the document_selfie_verification package in your pubspec.yaml file.
 * **Import Widget**: Import the DocumentSelfieVerification widget in your Dart file.
 * **Instantiate Widget**: Create an instance of the widget, providing necessary parameters:
 

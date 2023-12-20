@@ -1,4 +1,4 @@
-part of document_verification.widgets;
+part of document_selfie_verification.widgets;
 
 class DocumentPainter extends CustomPainter {
   DocumentPainter(this.color);

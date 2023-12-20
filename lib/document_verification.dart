@@ -1,4 +1,4 @@
-library document_verification;
+library document_selfie_verification;
 
 export 'models/models.dart';
 export 'extensions/extensions.dart';

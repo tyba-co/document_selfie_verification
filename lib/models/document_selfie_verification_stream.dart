@@ -1,4 +1,4 @@
-part of document_verification.models;
+part of document_selfie_verification.models;
 
 class DocumentSelfieVerificationStream extends DocumentVerificationBase {
   DocumentSelfieVerificationStream({
