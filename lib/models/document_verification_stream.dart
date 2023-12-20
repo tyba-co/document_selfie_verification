@@ -1,7 +1,7 @@
 part of document_verification.models;
 
-class DocumentVerificationStream extends DocumentVerificationBase {
-  DocumentVerificationStream({
+class DocumentSelfieVerificationStream extends DocumentVerificationBase {
+  DocumentSelfieVerificationStream({
     required this.image,
     required this.cameraDescription,
     required this.controller,

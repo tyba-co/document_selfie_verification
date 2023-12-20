@@ -1,76 +1,56 @@
-# Document Verification Library
+# DocumentSelfieVerification Widget
 
-Esta biblioteca proporciona clases para la verificación de documentos usando Google Cloud Vision API.
+This widget provides a comprehensive solution for capturing and verifying both documents and selfies within a Flutter application. It seamlessly integrates camera access, image processing, and validation features to ensure a smooth user experience.
 
-## Características
+## Key Features:
 
-* Valida texto usando MLKit TextRecognizer
-* Valida caras usando MLKit FaceDetector
-* Soporta diferentes orientaciones: retrato, paisaje
-* Proporciona métodos para convertir CameraImage a InputImage
+* **Document and Selfie Capture**: Captures both document and selfie images using the device's camera.
+* **Automatic Image Processing**: Processes images in real-time to detect text, faces, and validate their quality.
+* **Customizable Validation**: Offers parameters to adjust validation criteria for text and faces.
+* **Guidance for Users**: Displays clear instructions and feedback to guide users during the capture process.
+* **Image Success Callback**: Provides a callback function to handle successful image captures.
 
-## Uso
-```
-import 'package:document_verification/document_verification.dart';
+## Usage:
 
-void main() {
-// Create a document verification object
-DocumentVerificationStream stream = DocumentVerificationStream(
-image: image,
-cameraDescription: cameraDescription,
-controller: controller,
-country: CountryType.colombia,
-side: SideType.frontSide,
-keyWords: ['cedula', 'pasaporte', 'licencia'],
-);
+* **Add Dependency**: Include the document_verification package in your pubspec.yaml file.
+* **Import Widget**: Import the DocumentSelfieVerification widget in your Dart file.
+* **Instantiate Widget**: Create an instance of the widget, providing necessary parameters:
 
-// Validate text
-MLTextResponse mlResponse = await stream.checkMLText();
-if (mlResponse.keyWordsValidated) {
-print('Text validated');
-} else {
-print('Text not validated');
-}
 
-// Validate faces
-bool facesValidated = await stream.validateFaces(numFaces: 1);
-if (facesValidated) {
-print('Faces validated');
-} else {
-print('Faces not validated');
-}
-}
+
+<?code-excerpt "main.dart (DocumentSelfieVerification)"?>
+``` dart
+DocumentSelfieVerification(
+  imageSuccessCallback: (imageBytes) {
+    // Handle successful image capture here
+  },
+  side: SideType.frontSide,
+  country: CountryType.colombia,
+  imageSkip: 50,
+  // Other optional parameters
+)
 ```
 
-## Clases
-* DocumentVerificationBase: Define la estructura básica de una clase de verificación de documentos.
-* DocumentVerificationStream: Clase que proporciona métodos adicionales para validar documentos usando Google Cloud Vision API.
-MLTextResponse: Representa la respuesta del proceso de reconocimiento de texto.
+### Attributes:
 
-## Constantes
-* **frontDNIDocumentKeyWordsCO**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad colombiana.
-* **backDNIDocumentKeyWordsCO**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad colombiana.
-* **frontDNIDocumentKeyWordsCL**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad chilena.
-* **backDNIDocumentKeyWordsCL**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad chilena.
-* **frontDNIDocumentKeyWordsPE**: Lista de palabras clave predeterminadas para el frente de una cédula de identidad peruana.
-* **backDNIDocumentKeyWordsPE**: Lista de palabras clave predeterminadas para el reverso de una cédula de identidad peruana.
+| Attribute                  | Type                     | Description                                                                                                                               |
+|----------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| side                       | Side                     | Specifies the side of the document or selfie to be captured. Possible values:<br>Side.selfie,<br>Side.frontSide,<br>Side.backSide.        |
+| country                    | CountryType              | Specifies the country for text validation. Possible values: <br>CountryType.colombia,<br>CountryType.peru,<br>CountryType.chile.          |
+| imageSkip                  | int                      | Determines how many frames to skip between processing images. Default value: 50.                                                          |
+| imageSuccessCallback       | void Function(Uint8List) | A callback function that is invoked when a successful image capture occurs. The function receives the captured image data as a Uint8List. |
+| loadingWidget              | Widget?                  | An optional widget to display while the camera is initializing. If not provided, a default progress indicator will be displayed.          |
+| dontRecognizeAnythingLabel | String                   | The text to display when no text or faces are recognized in the image.                                                                    |
+| almostOneIsSuccessLabel    | String                   | The text to display when text is recognized but needs improvement (e.g., better focus or lighting).                                       |
+| dontRecognizeSelfieLabel   | String                   | The text to display when a selfie is not recognized.                                                                                      |
+| keyWords                   | List<String>?            | An optional list of keywords to validate in the text recognized from the document image. 
 
-## Enumeraciones
-* CountryType: Representa el país de un documento.
-* SideType: Representa el lado de un documento.
+## External Dependencies:
 
-## Instalación
-Para instalar la biblioteca, ejecute el siguiente comando:
+**camera: This library is essential for camera access and image capture. Ensure it's included in your project's dependencies. Installation instructions can be found at https://pub.dev/packages/camera.**
 
-dart pub add document_verification
+## Additional Notes:
 
-## Requisitos
-
-La biblioteca requiere las siguientes dependencias:
-
-* Google Mobile Vision
-* Google ML Kit
-
-## Licencia
-
-La biblioteca está licenciada bajo la licencia Apache 2.0.
+* **Orientation**: The widget automatically adjusts screen orientation to optimize capture for documents and selfies.
+Feedback: The widget provides visual feedback to guide users during capture, including focus indicators and instructional labels.
+* **Error Handling**: The widget includes error handling for camera access issues.

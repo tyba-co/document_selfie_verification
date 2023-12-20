@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   camera: ^0.10.5+5
+  convert_native_img_stream: ^0.0.1
   flutter:
     sdk: flutter
   google_ml_kit: ^0.16.2
