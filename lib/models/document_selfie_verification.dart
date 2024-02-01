@@ -5,9 +5,10 @@ class DocumentVerification extends DocumentVerificationBase {
     this.file,
     this.imageData,
     this.validateOneFaceExist = true,
-    List<String>? keyWords,
+    int numberOfTextMatches = 2,
     CountryType? country = CountryType.colombia,
     SideType? side = SideType.frontSide,
+    List<String>? keyWords,
   })  : assert(
           (kIsWeb && imageData != null && file == null) ||
               (!kIsWeb && imageData == null && file != null),
@@ -17,29 +18,21 @@ class DocumentVerification extends DocumentVerificationBase {
           country: country!,
           side: side!,
           keyWords: keyWords,
+          numberOfTextMatches: numberOfTextMatches,
         );
 
   bool validateOneFaceExist;
   File? file;
   Uint8List? imageData;
 
-  Future<bool> validate() async {
-    if (SideType.frontSide.isSelfie) {
-      return await validateOneFace();
-    }
-
-    bool hasOnlyOneFace = validateOneFaceExist ? await validateOneFace() : true;
-    bool hasText = await validateKeyWordsInFile(keyWordsToValidate);
-
-    return hasText && hasOnlyOneFace;
-  }
-
   Future<bool> validateOneFace() async {
     if (kIsWeb) {
       return await TextImageProcessingForWeb.instance
           .recognizePersonInPhoto(imageData!);
     }
-    return await hasOnlyOneFace(file!);
+
+    return await validateFaces(
+        file: Platform.isIOS ? await compressFile(file!) : file);
   }
 
   Future<bool> validateKeyWordsInFile(List<String> keyWords) async {
@@ -53,38 +46,10 @@ class DocumentVerification extends DocumentVerificationBase {
         }
       }
     } else {
-      hasText = await checkMLText(file, keyWords);
+      MLTextResponse rsponse = await checkMLText(file: file);
+      return rsponse.success;
     }
     return hasText;
-  }
-
-  Future<bool> checkMLText(File? file, List<String> match) async {
-    TextRecognizer textRecognizer = TextRecognizer();
-
-    InputImage inputImage = InputImage.fromFile(file!);
-    RecognizedText recognisedText =
-        await textRecognizer.processImage(inputImage);
-    String text = recognisedText.text;
-    bool test(String value) => text.toLowerCase().contains(value.toLowerCase());
-    return match.any(test);
-  }
-
-  Future<bool> hasOnlyOneFace(File file) async {
-    File fileToProcess = file;
-
-    if (Platform.isIOS) {
-      fileToProcess = await compressFile(file);
-    }
-
-    InputImage inputImage = InputImage.fromFile(fileToProcess);
-
-    List<Face> faces = <Face>[];
-    try {
-      faces = await faceDetector.processImage(inputImage);
-      return faces.length == 1;
-    } on Exception catch (_) {
-      return false;
-    }
   }
 
   String decodeImage(CompressObject object) {

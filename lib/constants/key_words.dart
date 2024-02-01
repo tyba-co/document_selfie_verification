@@ -2,7 +2,7 @@ part of document_selfie_verification.constants;
 
 const List<String> frontDNICO = <String>[
   'colombia',
-  'apellidos',
+  'nombres',
   'firma',
 ];
 
@@ -18,8 +18,7 @@ const List<String> backDNICO = <String>[
 
 const List<String> frontDNIPE = <String>[
   'republica',
-  'fecha',
-  'caducidad',
+  'fecha caducidad',
   '<<'
 ];
 

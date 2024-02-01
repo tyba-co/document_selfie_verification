@@ -8,10 +8,12 @@ class DocumentSelfieVerificationStream extends DocumentVerificationBase {
     CountryType? country = CountryType.colombia,
     SideType? side = SideType.frontSide,
     List<String>? keyWords,
+    int numberOfTextMatches = 2,
   }) : super(
           country: country!,
           side: side!,
           keyWords: keyWords,
+          numberOfTextMatches: numberOfTextMatches,
         );
 
   late CameraImage image;
@@ -20,31 +22,6 @@ class DocumentSelfieVerificationStream extends DocumentVerificationBase {
 
   InputImage get inputImage =>
       inputImageFromCameraImage(image, cameraDescription, controller)!;
-
-  Future<MLTextResponse> checkMLText() async {
-    TextRecognizer textRecognizer = TextRecognizer();
-    RecognizedText recognisedText =
-        await textRecognizer.processImage(inputImage);
-
-    List<TextBlock> blocks = recognisedText.blocks;
-
-    MLTextResponse mlResponse =
-        MLTextResponse(blocks: blocks, keyWords: keyWordsToValidate);
-
-    return mlResponse;
-  }
-
-  Future<bool> validateFaces({int maxFaces = 2}) async {
-    try {
-      if (side == SideType.backSide) {
-        return true;
-      }
-      List<Face> faces = await faceDetector.processImage(inputImage);
-      return faces.isNotEmpty && faces.length <= maxFaces;
-    } on Exception catch (_) {
-      return false;
-    }
-  }
 
   Map<DeviceOrientation, int> orientations = {
     DeviceOrientation.portraitUp: 0,

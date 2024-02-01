@@ -31,11 +31,17 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-      side: SideType.frontSide,
-      country: CountryType.colombia,
+      side: SideType.selfie,
+      country: CountryType.peru,
       imageSuccessCallback: (Uint8List imageConvert) {
         imageToShow = Image.memory(imageConvert);
         setState(() {});
+      },
+      accessPermisionErrorCallback: () {
+        print('Me toteo por permisos');
+      },
+      errorCallback: (Object e) {
+        print('Me toteo en el error');
       },
     );
   }

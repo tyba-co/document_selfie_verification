@@ -4,10 +4,12 @@ class MLTextResponse {
   MLTextResponse({
     required this.blocks,
     required this.keyWords,
+    required this.numberOfTextMatches,
   });
 
   List<TextBlock> blocks;
   List<String> keyWords;
+  int numberOfTextMatches;
 
   Map<String, dynamic> get blocksAndKeyword => keyWords.fold(
         {},
@@ -31,7 +33,7 @@ class MLTextResponse {
           (element) => blocksAndKeyword[element],
         )
         .toList();
-    return response.length >= 2;
+    return response.length >= numberOfTextMatches;
   }
 
   bool get almostOneIsSuccess => blocksAndKeyword.keys.any(
