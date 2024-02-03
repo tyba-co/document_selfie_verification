@@ -33,7 +33,7 @@ abstract class DocumentVerificationBase {
 
   Future<MLTextResponse> checkMLText(
       {InputImage? inputImage, File? file}) async {
-    assert(inputImage != null && file != null,
+    assert(inputImage != null || file != null,
         "at least one must be different from null");
 
     TextRecognizer textRecognizer = TextRecognizer();
@@ -53,7 +53,7 @@ abstract class DocumentVerificationBase {
 
   Future<bool> validateFaces(
       {int maxFaces = 2, InputImage? inputImage, File? file}) async {
-    assert(inputImage != null && file != null,
+    assert(inputImage != null || file != null,
         "at least one must be different from null");
     try {
       if (side == SideType.backSide) {

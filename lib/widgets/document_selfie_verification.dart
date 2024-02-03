@@ -5,18 +5,12 @@ class DocumentSelfieVerification extends StatefulWidget {
     required this.imageSuccessCallback,
     required this.side,
     required this.country,
-    required this.accessPermisionErrorCallback,
-    this.errorCallback,
+    required this.onException,
+    required this.onError,
     this.streamFramesToSkipValidation = 50,
     this.secondsToShowButton = 10,
     this.attempsToSkipValidation = 3,
     this.numberOfTextMatches = 2,
-    this.dontRecognizeAnythingLabel =
-        'Todo el documento debe estar dentro del recuadro , información y foto.',
-    this.almostOneIsSuccessLabel =
-        'Asegurate de que el documento este bien enfocado y no tenga brillos o sombras.',
-    this.dontRecognizeSelfieLabel =
-        'Asegurate de que tu rostro salga completo. Solo se admite un solo rostro.',
     this.loadingWidget,
     this.keyWords,
     this.onPressBackButton,
@@ -29,13 +23,10 @@ class DocumentSelfieVerification extends StatefulWidget {
   final int attempsToSkipValidation;
   final int numberOfTextMatches;
   final void Function(Uint8List) imageSuccessCallback;
-  final void Function(Object)? errorCallback;
-  final void Function() accessPermisionErrorCallback;
+  final void Function(Object) onError;
+  final void Function(DocumentSelfieException) onException;
   final void Function()? onPressBackButton;
   final Widget? loadingWidget;
-  final String dontRecognizeAnythingLabel;
-  final String almostOneIsSuccessLabel;
-  final String dontRecognizeSelfieLabel;
   final List<String>? keyWords;
 
   @override
@@ -47,6 +38,7 @@ class _DocumentSelfieVerificationState
     extends State<DocumentSelfieVerification> {
   CameraController? controller;
   int imageCounter = 0;
+  int attempsToSkipValidationCounter = 0;
   bool showFocusCircle = false;
   bool showButton = false;
   double x = 0;
@@ -56,6 +48,8 @@ class _DocumentSelfieVerificationState
   late CameraDescription cameraDescription;
 
   bool get isSelfie => widget.side == SideType.selfie;
+  bool get skipValidation =>
+      attempsToSkipValidationCounter >= widget.attempsToSkipValidation;
 
   @override
   void initState() {
@@ -115,10 +109,11 @@ class _DocumentSelfieVerificationState
       if (error is CameraException) {
         switch (error.code) {
           case 'CameraAccessDenied':
-            widget.accessPermisionErrorCallback();
+            widget.onException(DocumentSelfieException(
+                DocumentSelfieExceptionType.cameraAccessDenied));
             break;
           default:
-            widget.errorCallback?.call(error);
+            widget.onError(error);
             break;
         }
       }
@@ -144,15 +139,17 @@ class _DocumentSelfieVerificationState
       );
 
       if (isSelfie) {
-        await handleSelfie(documentSelfieVerificationStream, availableImage);
+        await handleSelfieStream(
+            documentSelfieVerificationStream, availableImage);
       } else {
-        await handleDocument(documentSelfieVerificationStream, availableImage);
+        await handleDocumentStream(
+            documentSelfieVerificationStream, availableImage);
       }
     });
   }
 
   Future<void> switchAutomaticToOnDemand() async {
-    controller!.stopImageStream();
+    controller?.stopImageStream();
     showButton = true;
     setState(() {});
   }
@@ -166,6 +163,38 @@ class _DocumentSelfieVerificationState
   }
 
   Future<void> handleDocument(
+    DocumentVerification documentSelfieVerification,
+  ) async {
+    attempsToSkipValidationCounter++;
+
+    Uint8List castToUin8List =
+        (await documentSelfieVerification.file?.readAsBytes()) ??
+            documentSelfieVerification.imageData!;
+
+    if (skipValidation) {
+      widget.imageSuccessCallback(castToUin8List);
+      return;
+    }
+
+    bool checkMLText =
+        await documentSelfieVerification.validateKeyWordsInFile();
+    bool hasFaces = await documentSelfieVerification.validateFaces();
+
+    if (checkMLText && hasFaces) {
+      SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+        DeviceOrientation.portraitUp,
+      ]);
+
+      widget.imageSuccessCallback(castToUin8List);
+      setState(() {});
+      return;
+    }
+
+    widget.onException(DocumentSelfieException(
+        DocumentSelfieExceptionType.notRecognizeAnything));
+  }
+
+  Future<void> handleDocumentStream(
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
@@ -188,22 +217,24 @@ class _DocumentSelfieVerificationState
     }
 
     if (checkMLText.dontRecognizeAnything) {
-      logger.i(widget.dontRecognizeAnythingLabel);
+      logger.i(DocumentSelfieExceptionType.notRecognizeAnything.message);
       return;
     }
 
     if (checkMLText.almostOneIsSuccess) {
-      logger.i(widget.almostOneIsSuccessLabel);
+      logger.i(DocumentSelfieExceptionType.almostOneIsSuccess.message);
       return;
     }
   }
 
-  Future<void> handleSelfie(
+  Future<void> handleSelfieStream(
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
-    bool isValid =
-        await documentSelfieVerificationStream.validateFaces(maxFaces: 1);
+    bool isValid = await documentSelfieVerificationStream.validateFaces(
+      maxFaces: 1,
+      inputImage: documentSelfieVerificationStream.inputImage,
+    );
 
     if (isValid) {
       Uint8List? imageConvert =
@@ -221,18 +252,42 @@ class _DocumentSelfieVerificationState
       setState(() {});
       return;
     }
-    logger.i(widget.dontRecognizeSelfieLabel);
+    logger.i(DocumentSelfieExceptionType.notRecognizeSelfie.message);
     return;
+  }
+
+  Future<void> handleSelfie(
+    DocumentVerification documentSelfieVerification,
+  ) async {
+    attempsToSkipValidationCounter++;
+    Uint8List castToUin8List =
+        (await documentSelfieVerification.file?.readAsBytes()) ??
+            documentSelfieVerification.imageData!;
+    if (skipValidation) {
+      widget.imageSuccessCallback(castToUin8List);
+      return;
+    }
+
+    bool isValid =
+        await documentSelfieVerification.validateOneFace(maxFaces: 1);
+
+    if (isValid) {
+      widget.imageSuccessCallback(castToUin8List);
+      return;
+    }
+
+    widget.onException(DocumentSelfieException(
+        DocumentSelfieExceptionType.notRecognizeSelfie));
   }
 
   @override
   void dispose() {
     controller?.dispose();
+    timer.cancel();
     super.dispose();
   }
 
   Future<void> onTapUp(TapUpDetails details) async {
-    print('onTapUp');
     showFocusCircle = true;
     x = details.localPosition.dx;
     y = details.localPosition.dy;
@@ -259,32 +314,56 @@ class _DocumentSelfieVerificationState
   }
 
   Future<void> takePhoto() async {
-    // XFile? xFile = await getFile();
+    showLoading();
+    XFile? xFile = await getFile();
 
-    // if (xFile == null) {
-    //   throw 'Unread File';
-    // }
+    if (xFile == null) {
+      throw 'Unread File';
+    }
 
-    // File file = File(xFile.path);
+    File file = File(xFile.path);
 
-    // DocumentVerification document = DocumentVerification(
-    //   file: file,
-    //   side: widget.side,
-    //   country: widget.country,
-    //   keyWords: widget.keyWords,
-    //   numberOfTextMatches: widget.numberOfTextMatches,
-    // );
+    DocumentVerification document = DocumentVerification(
+      file: file,
+      side: widget.side,
+      country: widget.country,
+      keyWords: widget.keyWords,
+      numberOfTextMatches: widget.numberOfTextMatches,
+    );
 
-    //     DocumentSelfieVerificationStream(
-    //   cameraDescription: cameraDescription,
-    //   controller: controller!,
-    //   image: availableImage,
-    //   side: widget.side,
-    //   country: widget.country,
-    //   keyWords: widget.keyWords,
-    //   numberOfTextMatches: widget.numberOfTextMatches,
-    // );
-    // widget.imageSuccessCallback(await file.readAsBytes());
+    if (isSelfie) {
+      await handleSelfie(document);
+    } else {
+      await handleDocument(document);
+    }
+    closeLoading();
+  }
+
+  void showLoading() {
+    Size size = MediaQuery.of(context).size;
+    double height = size.height;
+    double width = size.width;
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      useSafeArea: false,
+      builder: (BuildContext _) =>
+          widget.loadingWidget ??
+          SizedBox(
+            width: width,
+            height: height,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Colors.white.withOpacity(0.8),
+              ),
+            ),
+          ),
+      useRootNavigator: false,
+    );
+  }
+
+  void closeLoading() {
+    Navigator.of(context).pop();
   }
 
   @override
@@ -296,10 +375,14 @@ class _DocumentSelfieVerificationState
           );
     }
 
-    double appBarHeight = MediaQuery.of(context).padding.top + kToolbarHeight;
-    double bodyHeight = MediaQuery.of(context).size.height - appBarHeight;
+    Size size = MediaQuery.of(context).size;
+    double height = size.height;
+    EdgeInsets padding = MediaQuery.of(context).padding;
 
-    double marginBottom = MediaQuery.of(context).padding.bottom + 42;
+    double appBarHeight = padding.top + kToolbarHeight;
+    double bodyHeight = height - appBarHeight;
+
+    double marginBottom = padding.bottom + 42;
 
     return Scaffold(
       appBar: AppBar(
@@ -328,7 +411,7 @@ class _DocumentSelfieVerificationState
               onTapUp: onTapUp,
               child: CustomPaint(
                   painter: isSelfie
-                      ? SelfiePainter(Color(0xff28363E).withOpacity(0.6))
+                      ? SelfiePainter(const Color(0xff28363E).withOpacity(0.6))
                       : DocumentPainter(Colors.black.withOpacity(0.6)),
                   size: Size(
                     MediaQuery.of(context).size.width,

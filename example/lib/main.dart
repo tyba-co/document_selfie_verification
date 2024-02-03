@@ -1,6 +1,7 @@
 import 'package:document_selfie_verification/document_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,13 @@ class ExampleWidget extends StatefulWidget {
 
 class _ExampleWidgetState extends State<ExampleWidget> {
   Image? imageToShow;
+  late Logger logger;
+
+  @override
+  void initState() {
+    logger = Logger();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +45,11 @@ class _ExampleWidgetState extends State<ExampleWidget> {
         imageToShow = Image.memory(imageConvert);
         setState(() {});
       },
-      accessPermisionErrorCallback: () {
-        print('Me toteo por permisos');
+      onException: (DocumentSelfieException e) {
+        logger.i('onException $e');
       },
-      errorCallback: (Object e) {
-        print('Me toteo en el error');
+      onError: (Object e) {
+        logger.e('onError $e');
       },
     );
   }

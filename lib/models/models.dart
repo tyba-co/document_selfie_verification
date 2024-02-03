@@ -21,3 +21,4 @@ part 'document_selfie_verification.dart';
 part 'document_selfie_verification_stream.dart';
 part 'abstract_document_selfie_verification.dart';
 part 'ml_text_response.dart';
+part 'exception.dart';
