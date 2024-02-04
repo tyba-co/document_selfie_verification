@@ -7,8 +7,16 @@ class DocumentPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint();
+    Paint paint = Paint();
     paint.color = color;
+
+    Paint cornersCombine = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 4;
+
+    double cornerValue = 50;
+
     canvas.drawPath(
       Path.combine(
         PathOperation.difference,
@@ -20,7 +28,7 @@ class DocumentPainter extends CustomPainter {
             RRect.fromLTRBR(
               64,
               32,
-              size.width - 64,
+              size.width - 32,
               size.height - 32,
               const Radius.circular(10),
             ),
@@ -29,6 +37,62 @@ class DocumentPainter extends CustomPainter {
       ),
       paint,
     );
+
+    Path baseCorners = Path.combine(
+        PathOperation.difference,
+        Path()
+          ..addRRect(
+            RRect.fromLTRBR(
+              124,
+              44,
+              size.width - 96,
+              size.height - 44,
+              const Radius.circular(10),
+            ),
+          ),
+        Path()
+          ..addRRect(
+            RRect.fromLTRBR(
+              124 + 4,
+              44 + 4,
+              size.width - (96 + 4),
+              size.height - (44 + 4),
+              const Radius.circular(10),
+            ),
+          )
+          ..close());
+
+    Path removeVerticalLines = Path.combine(
+        PathOperation.difference,
+        baseCorners,
+        Path()
+          ..addRRect(
+            RRect.fromLTRBR(
+              124 + cornerValue,
+              44,
+              size.width - (96 + cornerValue),
+              size.height - 44,
+              const Radius.circular(0),
+            ),
+          )
+          ..close());
+
+    Path removeHorizontalLines = Path.combine(
+        PathOperation.difference,
+        removeVerticalLines,
+        Path()
+          ..addRRect(
+            RRect.fromLTRBR(
+              124,
+              44 + cornerValue,
+              size.width - 96,
+              size.height - (44 + cornerValue),
+              const Radius.circular(0),
+            ),
+          )
+          ..close());
+
+    canvas.drawPath(removeHorizontalLines, cornersCombine);
   }
 
   @override
