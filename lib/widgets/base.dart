@@ -39,12 +39,12 @@ abstract class DocumentSelfieVerificationState
         );
       }
 
-      // unawaited(
-      //   SystemChrome.setEnabledSystemUIMode(
-      //     SystemUiMode.manual,
-      //     overlays: <SystemUiOverlay>[],
-      //   ),
-      // );
+      unawaited(
+        SystemChrome.setEnabledSystemUIMode(
+          SystemUiMode.manual,
+          overlays: <SystemUiOverlay>[],
+        ),
+      );
       await initCamera();
     });
   }

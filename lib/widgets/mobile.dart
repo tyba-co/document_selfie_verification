@@ -2,6 +2,40 @@ part of document_selfie_verification.widgets;
 
 class Mobile extends DocumentSelfieVerificationState {
   bool showModal = false;
+  bool showID = true;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Timer(const Duration(seconds: 4), () {
+        showID = false;
+        setState(() {});
+      });
+    });
+
+    super.initState();
+  }
+
+  Widget get loadImage {
+    String backImage = 'assets/id_ghost_back.svg';
+    String frontLeft = 'assets/id_ghost_frontal_left.svg';
+    String frontRight = 'assets/id_ghost_frontal_right.svg';
+
+    String imageToRender = switch (widget.side) {
+      SideType.frontSide when widget.country == CountryType.colombia =>
+        frontLeft,
+      SideType.backSide => backImage,
+      SideType.frontSide => frontRight,
+      _ => frontLeft,
+    };
+
+    return SvgPicture.asset(
+      imageToRender,
+      package: 'document_selfie_verification',
+      width: 240,
+      height: 240,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +222,15 @@ class Mobile extends DocumentSelfieVerificationState {
                       ),
                     ),
                   ),
-                )
+                ),
+                Visibility(
+                  visible: showID,
+                  child: Positioned(
+                    bottom: 80,
+                    left: 160,
+                    child: loadImage,
+                  ),
+                ),
               ],
             )
           : Padding(

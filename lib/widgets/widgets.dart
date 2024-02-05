@@ -7,6 +7,7 @@ import 'package:camera/camera.dart';
 import 'package:convert_native_img_stream/convert_native_img_stream.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/models.dart';
 import '../enums/enums.dart';
 import 'package:flutter/services.dart';

@@ -39,8 +39,8 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-      side: SideType.selfie,
-      country: CountryType.peru,
+      side: SideType.backSide,
+      country: CountryType.colombia,
       imageSuccessCallback: (Uint8List imageConvert) {
         imageToShow = Image.memory(imageConvert);
         setState(() {});
