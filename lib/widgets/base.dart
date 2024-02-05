@@ -18,15 +18,12 @@ abstract class DocumentSelfieVerificationState
   late CameraDescription cameraDescription;
 
   bool get isSelfie => widget.side == SideType.selfie;
-  bool get skipValidation =>
-      attempsToSkipValidationCounter >= widget.attempsToSkipValidation;
 
   @override
   void initState() {
-    super.initState();
     logger = Logger();
     timer = Timer(
-      Duration(seconds: widget.secondsToShowButton),
+      Duration(seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
       switchAutomaticToOnDemand,
     );
 
@@ -47,6 +44,7 @@ abstract class DocumentSelfieVerificationState
       );
       await initCamera();
     });
+    super.initState();
   }
 
   Future<void> initCamera() async {
@@ -71,9 +69,13 @@ abstract class DocumentSelfieVerificationState
       if (!mounted) {
         return;
       }
+
       await controller!.setFlashMode(FlashMode.off);
 
-      await startStream(cameraDescription);
+      if (!widget.skipValidation) {
+        await startStream(cameraDescription);
+      }
+
       setState(() {});
     }).catchError((Object error) {
       if (error is CameraException) {
@@ -132,36 +134,30 @@ abstract class DocumentSelfieVerificationState
     return file;
   }
 
-  Future<void> handleDocument(
+  Future<(Uint8List, DocumentSelfieException?)> handleDocument(
     DocumentVerification documentSelfieVerification,
   ) async {
-    attempsToSkipValidationCounter++;
-
     Uint8List castToUin8List =
         (await documentSelfieVerification.file?.readAsBytes()) ??
             documentSelfieVerification.imageData!;
 
-    if (skipValidation) {
-      widget.imageSuccessCallback(castToUin8List);
-      return;
+    if (widget.skipValidation) {
+      return (castToUin8List, null);
     }
 
     bool checkMLText =
         await documentSelfieVerification.validateKeyWordsInFile();
-    bool hasFaces = await documentSelfieVerification.validateFaces();
+    bool hasFaces = await documentSelfieVerification.validateFaces(
+        file: documentSelfieVerification.file);
 
     if (checkMLText && hasFaces) {
-      SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]);
-
-      widget.imageSuccessCallback(castToUin8List);
-      setState(() {});
-      return;
+      return (castToUin8List, null);
     }
 
-    widget.onException(DocumentSelfieException(
-        DocumentSelfieExceptionType.notRecognizeAnything));
+    return (
+      castToUin8List,
+      DocumentSelfieException(DocumentSelfieExceptionType.notRecognizeAnything)
+    );
   }
 
   Future<void> handleDocumentStream(
@@ -180,7 +176,7 @@ abstract class DocumentSelfieVerificationState
       Uint8List? imageConvert = await ConvertNativeImgStream()
           .convertImgToBytes(availableImage.planes.first.bytes,
               availableImage.width, availableImage.height);
-      widget.imageSuccessCallback(imageConvert!);
+      widget.onImageCallback(imageConvert!);
       SystemChrome.setPreferredOrientations(<DeviceOrientation>[
         DeviceOrientation.portraitUp,
       ]);
@@ -217,7 +213,7 @@ abstract class DocumentSelfieVerificationState
         rotationFix: -90,
       );
 
-      widget.imageSuccessCallback(imageConvert!);
+      widget.onImageCallback(imageConvert!);
       SystemChrome.setPreferredOrientations(<DeviceOrientation>[
         DeviceOrientation.portraitUp,
       ]);
@@ -228,28 +224,27 @@ abstract class DocumentSelfieVerificationState
     return;
   }
 
-  Future<void> handleSelfie(
+  Future<(Uint8List, DocumentSelfieException?)> handleSelfie(
     DocumentVerification documentSelfieVerification,
   ) async {
-    attempsToSkipValidationCounter++;
     Uint8List castToUin8List =
         (await documentSelfieVerification.file?.readAsBytes()) ??
             documentSelfieVerification.imageData!;
-    if (skipValidation) {
-      widget.imageSuccessCallback(castToUin8List);
-      return;
+    if (widget.skipValidation) {
+      return (castToUin8List, null);
     }
 
     bool isValid =
         await documentSelfieVerification.validateOneFace(maxFaces: 1);
 
     if (isValid) {
-      widget.imageSuccessCallback(castToUin8List);
-      return;
+      return (castToUin8List, null);
     }
 
-    widget.onException(DocumentSelfieException(
-        DocumentSelfieExceptionType.notRecognizeSelfie));
+    return (
+      castToUin8List,
+      DocumentSelfieException(DocumentSelfieExceptionType.notRecognizeSelfie)
+    );
   }
 
   @override
@@ -302,13 +297,19 @@ abstract class DocumentSelfieVerificationState
       keyWords: widget.keyWords,
       numberOfTextMatches: widget.numberOfTextMatches,
     );
-
+    attempsToSkipValidationCounter++;
+    (Uint8List, DocumentSelfieException?) response;
     if (isSelfie) {
-      await handleSelfie(document);
+      response = await handleSelfie(document);
     } else {
-      await handleDocument(document);
+      response = await handleDocument(document);
+      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+        DeviceOrientation.portraitUp,
+      ]);
     }
+
     closeLoading();
+    widget.onImageCallback(response.$1, exception: response.$2);
   }
 
   void showLoading() {

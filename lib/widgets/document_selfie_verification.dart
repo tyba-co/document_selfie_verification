@@ -2,14 +2,14 @@ part of document_selfie_verification.widgets;
 
 class DocumentSelfieVerification extends StatefulWidget {
   const DocumentSelfieVerification({
-    required this.imageSuccessCallback,
+    required this.onImageCallback,
     required this.side,
     required this.country,
     required this.onException,
     required this.onError,
     this.streamFramesToSkipValidation = 50,
     this.secondsToShowButton = 10,
-    this.attempsToSkipValidation = 3,
+    this.skipValidation = false,
     this.numberOfTextMatches = 2,
     this.loadingWidget,
     this.keyWords,
@@ -20,9 +20,10 @@ class DocumentSelfieVerification extends StatefulWidget {
   final CountryType country;
   final int streamFramesToSkipValidation;
   final int secondsToShowButton;
-  final int attempsToSkipValidation;
+  final bool skipValidation;
   final int numberOfTextMatches;
-  final void Function(Uint8List) imageSuccessCallback;
+  final void Function(Uint8List, {DocumentSelfieException? exception})
+      onImageCallback;
   final void Function(Object) onError;
   final void Function(DocumentSelfieException) onException;
   final void Function()? onPressBackButton;
