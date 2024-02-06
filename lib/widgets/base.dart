@@ -209,12 +209,27 @@ abstract class DocumentSelfieVerificationState
       inputImage: documentSelfieVerificationStream.inputImage,
     );
 
-    Uint8List? imageConvert = await ConvertNativeImgStream().convertImgToBytes(
-      availableImage.planes.first.bytes,
-      availableImage.width,
-      availableImage.height,
-      rotationFix: -90,
-    );
+    Uint8List? imageConvert;
+    if (Platform.isAndroid) {
+      imageConvert = await ConvertNativeImgStream().convertImgToBytes(
+        availableImage.planes.first.bytes,
+        availableImage.width,
+        availableImage.height,
+        rotationFix: -90,
+      );
+    } else {
+
+      Plane plane = availableImage.planes.first;
+      imglib.Image image = imglib.Image.fromBytes(
+        width: availableImage.width,
+        height: availableImage.height,
+        bytes: plane.bytes.buffer,
+        rowStride: plane.bytesPerRow,
+        order: imglib.ChannelOrder.bgra,
+      );
+
+      imageConvert = imglib.encodeJpg(image);
+    }
 
     if (isValid) {
       return (imageConvert!, null);
@@ -342,12 +357,16 @@ abstract class DocumentSelfieVerificationState
 
   Future<void> rotateCamera(CameraController controller) async {
     if (!isSelfie) {
-      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.landscapeLeft,
-      ]);
       if (Platform.isIOS) {
+        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+          DeviceOrientation.landscapeRight,
+        ]);
         await controller
-            .lockCaptureOrientation(DeviceOrientation.landscapeRight);
+            .lockCaptureOrientation(DeviceOrientation.landscapeLeft);
+      } else {
+        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+          DeviceOrientation.landscapeLeft,
+        ]);
       }
     }
   }

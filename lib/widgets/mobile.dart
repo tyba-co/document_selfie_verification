@@ -7,6 +7,9 @@ class Mobile extends DocumentSelfieVerificationState {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isSelfie) {
+        return;
+      }   
       if (widget.skipValidation) {
         showID = false;
         setState(() {});

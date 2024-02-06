@@ -12,6 +12,7 @@ import '../models/models.dart';
 import '../enums/enums.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
+import 'package:image/image.dart' as imglib;
 
 part 'custom_paint.dart';
 part 'document_selfie_verification.dart';
