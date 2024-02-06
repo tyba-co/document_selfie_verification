@@ -73,8 +73,6 @@ DocumentSelfieVerification(
 | dontRecognizeSelfieLabel     | String                                                         | The text to display when a selfie is not recognized.                                                                                                                                                                          |
 | keyWords                     | List<String>?                                                  | An optional list of keywords to validate in the text recognized from the document image.                                                                                                                                      |
 
-    this.onPressBackButton, -->
-
 ## External Dependencies:
 
 **camera: This library is essential for camera access and image capture. Ensure it's included in your project's dependencies. Installation instructions can be found at https://pub.dev/packages/camera.**
