@@ -16,7 +16,9 @@ class MLTextResponse {
         (previousValue, element) {
           bool test(TextBlock value) {
             String textValue = value.text.withoutDiacriticalMarks;
-            return textValue.toLowerCase().contains(element.toLowerCase());
+            bool isContain =
+                textValue.toLowerCase().contains(element.toLowerCase());
+            return isContain;
           }
 
           bool match = blocks.any(test);

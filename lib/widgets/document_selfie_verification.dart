@@ -8,7 +8,7 @@ class DocumentSelfieVerification extends StatefulWidget {
     required this.onException,
     required this.onError,
     this.streamFramesToSkipValidation = 50,
-    this.secondsToShowButton = 10,
+    this.secondsToShowButton = 20,
     this.skipValidation = false,
     this.numberOfTextMatches = 2,
     this.loadingWidget,

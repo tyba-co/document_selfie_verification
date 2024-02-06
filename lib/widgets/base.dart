@@ -22,11 +22,6 @@ abstract class DocumentSelfieVerificationState
   @override
   void initState() {
     logger = Logger();
-    timer = Timer(
-      Duration(seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
-      switchAutomaticToOnDemand,
-    );
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!isSelfie) {
         unawaited(
@@ -58,7 +53,7 @@ abstract class DocumentSelfieVerificationState
 
     controller = CameraController(
       cameraDescription,
-      ResolutionPreset.max,
+      ResolutionPreset.high,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.nv21
@@ -69,8 +64,14 @@ abstract class DocumentSelfieVerificationState
       if (!mounted) {
         return;
       }
+      timer = Timer(
+        Duration(
+            seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
+        switchAutomaticToOnDemand,
+      );
 
       await controller!.setFlashMode(FlashMode.off);
+      await controller!.setFocusMode(FocusMode.auto);
 
       if (!widget.skipValidation) {
         await startStream(cameraDescription);
@@ -173,9 +174,14 @@ abstract class DocumentSelfieVerificationState
     );
 
     if (checkMLText.success && hasFaces) {
-      Uint8List? imageConvert = await ConvertNativeImgStream()
-          .convertImgToBytes(availableImage.planes.first.bytes,
-              availableImage.width, availableImage.height);
+      Uint8List? imageConvert =
+          await ConvertNativeImgStream().convertImgToBytes(
+        availableImage.planes.first.bytes,
+        availableImage.width,
+        availableImage.height,
+        rotationFix: -360,
+      );
+
       widget.onImageCallback(imageConvert!);
       SystemChrome.setPreferredOrientations(<DeviceOrientation>[
         DeviceOrientation.portraitUp,
@@ -267,9 +273,8 @@ abstract class DocumentSelfieVerificationState
 
     Offset point = Offset(xp, yp);
 
+    await controller!.setExposurePoint(point);
     await controller!.setFocusPoint(point);
-
-    controller!.setExposurePoint(point);
 
     setState(() {
       Future.delayed(const Duration(seconds: 1)).whenComplete(() {
