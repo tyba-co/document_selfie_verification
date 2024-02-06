@@ -1,7 +1,7 @@
 name: document_selfie_verification
-description: A new Flutter package project.
+description: This widget provides a comprehensive solution for capturing and verifying both documents and selfies within a Flutter application. It seamlessly integrates camera access, image processing, and validation features to ensure a smooth user experience.
 version: 0.0.1
-homepage:
+homepage: https://github.com/tyba-co/document_selfie_verification
 
 environment:
   sdk: ">=3.1.5 <4.0.0"
