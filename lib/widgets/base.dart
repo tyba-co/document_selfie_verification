@@ -23,14 +23,6 @@ abstract class DocumentSelfieVerificationState
   void initState() {
     logger = Logger();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!isSelfie) {
-        unawaited(
-          SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-            DeviceOrientation.landscapeLeft,
-          ]),
-        );
-      }
-
       unawaited(
         SystemChrome.setEnabledSystemUIMode(
           SystemUiMode.manual,
@@ -53,7 +45,7 @@ abstract class DocumentSelfieVerificationState
 
     controller = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.max,
       enableAudio: false,
       imageFormatGroup: Platform.isAndroid
           ? ImageFormatGroup.nv21
@@ -72,6 +64,7 @@ abstract class DocumentSelfieVerificationState
 
       await controller!.setFlashMode(FlashMode.off);
       await controller!.setFocusMode(FocusMode.auto);
+      await rotateCamera(controller!);
 
       if (!widget.skipValidation) {
         await startStream(cameraDescription);
@@ -111,18 +104,28 @@ abstract class DocumentSelfieVerificationState
         numberOfTextMatches: widget.numberOfTextMatches,
       );
 
+      (Uint8List, DocumentSelfieException?) response;
       if (isSelfie) {
-        await handleSelfieStream(
+        response = await handleSelfieStream(
             documentSelfieVerificationStream, availableImage);
       } else {
-        await handleDocumentStream(
+        response = await handleDocumentStream(
             documentSelfieVerificationStream, availableImage);
+      }
+
+      if (response.$2 == null) {
+        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+          DeviceOrientation.portraitUp,
+        ]);
+        widget.onImageCallback(response.$1, exception: response.$2);
       }
     });
   }
 
   Future<void> switchAutomaticToOnDemand() async {
-    controller?.stopImageStream();
+    if (!widget.skipValidation) {
+      controller?.stopImageStream();
+    }
     showButton = true;
     setState(() {});
   }
@@ -161,7 +164,7 @@ abstract class DocumentSelfieVerificationState
     );
   }
 
-  Future<void> handleDocumentStream(
+  Future<(Uint8List, DocumentSelfieException?)> handleDocumentStream(
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
@@ -173,35 +176,31 @@ abstract class DocumentSelfieVerificationState
       inputImage: documentSelfieVerificationStream.inputImage,
     );
 
+    Uint8List? imageConvert = await ConvertNativeImgStream().convertImgToBytes(
+      availableImage.planes.first.bytes,
+      availableImage.width,
+      availableImage.height,
+      rotationFix: -360,
+    );
+
     if (checkMLText.success && hasFaces) {
-      Uint8List? imageConvert =
-          await ConvertNativeImgStream().convertImgToBytes(
-        availableImage.planes.first.bytes,
-        availableImage.width,
-        availableImage.height,
-        rotationFix: -360,
-      );
-
-      widget.onImageCallback(imageConvert!);
-      SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]);
-      setState(() {});
-      return;
-    }
-
-    if (checkMLText.dontRecognizeAnything) {
-      logger.i(DocumentSelfieExceptionType.notRecognizeAnything.message);
-      return;
+      return (imageConvert!, null);
     }
 
     if (checkMLText.almostOneIsSuccess) {
-      logger.i(DocumentSelfieExceptionType.almostOneIsSuccess.message);
-      return;
+      return (
+        imageConvert!,
+        DocumentSelfieException(DocumentSelfieExceptionType.almostOneIsSuccess)
+      );
     }
+
+    return (
+      imageConvert!,
+      DocumentSelfieException(DocumentSelfieExceptionType.notRecognizeAnything)
+    );
   }
 
-  Future<void> handleSelfieStream(
+  Future<(Uint8List, DocumentSelfieException?)> handleSelfieStream(
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
@@ -210,24 +209,21 @@ abstract class DocumentSelfieVerificationState
       inputImage: documentSelfieVerificationStream.inputImage,
     );
 
-    if (isValid) {
-      Uint8List? imageConvert =
-          await ConvertNativeImgStream().convertImgToBytes(
-        availableImage.planes.first.bytes,
-        availableImage.width,
-        availableImage.height,
-        rotationFix: -90,
-      );
+    Uint8List? imageConvert = await ConvertNativeImgStream().convertImgToBytes(
+      availableImage.planes.first.bytes,
+      availableImage.width,
+      availableImage.height,
+      rotationFix: -90,
+    );
 
-      widget.onImageCallback(imageConvert!);
-      SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]);
-      setState(() {});
-      return;
+    if (isValid) {
+      return (imageConvert!, null);
     }
-    logger.i(DocumentSelfieExceptionType.notRecognizeSelfie.message);
-    return;
+
+    return (
+      imageConvert!,
+      DocumentSelfieException(DocumentSelfieExceptionType.notRecognizeSelfie)
+    );
   }
 
   Future<(Uint8List, DocumentSelfieException?)> handleSelfie(
@@ -342,6 +338,18 @@ abstract class DocumentSelfieVerificationState
 
   void closeLoading() {
     Navigator.of(context).pop();
+  }
+
+  Future<void> rotateCamera(CameraController controller) async {
+    if (!isSelfie) {
+      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+        DeviceOrientation.landscapeLeft,
+      ]);
+      if (Platform.isIOS) {
+        await controller
+            .lockCaptureOrientation(DeviceOrientation.landscapeRight);
+      }
+    }
   }
 
   @override

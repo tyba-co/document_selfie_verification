@@ -37,8 +37,7 @@ class Mobile extends DocumentSelfieVerificationState {
     return SvgPicture.asset(
       imageToRender,
       package: 'document_selfie_verification',
-      width: 240,
-      height: 240,
+      width: MediaQuery.of(context).size.width * 0.45,
     );
   }
 
@@ -232,7 +231,7 @@ class Mobile extends DocumentSelfieVerificationState {
                   visible: showID,
                   child: Positioned(
                     bottom: 80,
-                    left: 160,
+                    left: width * 0.20,
                     child: loadImage,
                   ),
                 ),
