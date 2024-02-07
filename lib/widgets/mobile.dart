@@ -7,9 +7,9 @@ class Mobile extends DocumentSelfieVerificationState {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isSelfie) {
+      if (widget.side.isSelfie) {
         return;
-      }   
+      }
       if (widget.skipValidation) {
         showID = false;
         setState(() {});
@@ -66,7 +66,7 @@ class Mobile extends DocumentSelfieVerificationState {
     return Scaffold(
       appBar: AppBar(
         backgroundColor:
-            !isSelfie ? Colors.transparent : const Color(0xff28363e),
+            !widget.side.isSelfie ? Colors.transparent : const Color(0xff28363e),
         leading: IconButton(
           key: const Key('back_button'),
           icon: const Icon(
@@ -78,7 +78,7 @@ class Mobile extends DocumentSelfieVerificationState {
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: !isSelfie
+      body: !widget.side.isSelfie
           ? Stack(
               children: [
                 SizedBox(
@@ -276,9 +276,9 @@ class Mobile extends DocumentSelfieVerificationState {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        const Text(
-                          'Mantén tu rostro centrado',
-                          style: TextStyle(
+                        Text(
+                          'Pon cara de ${emoji.label}',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             height: 24 / 18,

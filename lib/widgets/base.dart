@@ -16,12 +16,12 @@ abstract class DocumentSelfieVerificationState
   late Logger logger;
   late Timer timer;
   late CameraDescription cameraDescription;
-
-  bool get isSelfie => widget.side == SideType.selfie;
+  late EmojiType emoji;
 
   @override
   void initState() {
     logger = Logger();
+    emoji = EmojiType.randomEmoji();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       unawaited(
         SystemChrome.setEnabledSystemUIMode(
@@ -37,8 +37,8 @@ abstract class DocumentSelfieVerificationState
   Future<void> initCamera() async {
     List<CameraDescription> cameras = await availableCameras();
 
-    int cameraIndex = isSelfie ? 1 : 0;
-    if (Platform.isIOS && cameras.length > 3 && !isSelfie) {
+    int cameraIndex = widget.side.isSelfie ? 1 : 0;
+    if (Platform.isIOS && cameras.length > 3 && !widget.side.isSelfie) {
       cameraIndex = cameras.length - 1;
     }
     cameraDescription = cameras[cameraIndex];
@@ -105,7 +105,7 @@ abstract class DocumentSelfieVerificationState
       );
 
       (Uint8List, DocumentSelfieException?) response;
-      if (isSelfie) {
+      if (widget.side.isSelfie) {
         response = await handleSelfieStream(
             documentSelfieVerificationStream, availableImage);
       } else {
@@ -117,7 +117,11 @@ abstract class DocumentSelfieVerificationState
         await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
           DeviceOrientation.portraitUp,
         ]);
-        widget.onImageCallback(response.$1, exception: response.$2);
+        widget.onImageCallback(
+          response.$1,
+          exception: response.$2,
+          emoji: emoji,
+        );
       }
     });
   }
@@ -218,7 +222,6 @@ abstract class DocumentSelfieVerificationState
         rotationFix: -90,
       );
     } else {
-
       Plane plane = availableImage.planes.first;
       imglib.Image image = imglib.Image.fromBytes(
         width: availableImage.width,
@@ -315,7 +318,7 @@ abstract class DocumentSelfieVerificationState
     );
     attempsToSkipValidationCounter++;
     (Uint8List, DocumentSelfieException?) response;
-    if (isSelfie) {
+    if (widget.side.isSelfie) {
       response = await handleSelfie(document);
     } else {
       response = await handleDocument(document);
@@ -356,7 +359,7 @@ abstract class DocumentSelfieVerificationState
   }
 
   Future<void> rotateCamera(CameraController controller) async {
-    if (!isSelfie) {
+    if (!widget.side.isSelfie) {
       if (Platform.isIOS) {
         await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
           DeviceOrientation.landscapeRight,

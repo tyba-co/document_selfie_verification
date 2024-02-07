@@ -22,8 +22,11 @@ class DocumentSelfieVerification extends StatefulWidget {
   final int secondsToShowButton;
   final bool skipValidation;
   final int numberOfTextMatches;
-  final void Function(Uint8List, {DocumentSelfieException? exception})
-      onImageCallback;
+  final void Function(
+    Uint8List, {
+    EmojiType? emoji,
+    DocumentSelfieException? exception,
+  }) onImageCallback;
   final void Function(Object) onError;
   final void Function(DocumentSelfieException) onException;
   final void Function()? onPressBackButton;

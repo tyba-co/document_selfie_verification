@@ -138,14 +138,16 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-      side: SideType.frontSide,
+      side: SideType.selfie,
       country: CountryType.colombia,
       skipValidation: skipValidation,
       onImageCallback: (
         Uint8List imageConvert, {
+        EmojiType? emoji,
         DocumentSelfieException? exception,
       }) {
         counter++;
+        print('EmojiType? emoji, $emoji');
         if (exception != null && !skipValidation) {
           this.exception = exception;
         }
