@@ -326,7 +326,11 @@ abstract class DocumentSelfieVerificationState
         : await handleDocument(document);
 
     closeLoading();
-    widget.onImageCallback(response.$1, exception: response.$2);
+    widget.onImageCallback(
+      response.$1,
+      exception: response.$2,
+      emoji: widget.side.isSelfie ? emoji : null,
+    );
   }
 
   void showLoading() {
