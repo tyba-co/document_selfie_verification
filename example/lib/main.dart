@@ -67,7 +67,11 @@ class _ExampleWidgetState extends State<ExampleWidget> {
             children: <Widget>[
               SizedBox(
                 height: 300,
-                child: imageToShow,
+                child: InteractiveViewer(
+                    maxScale: 5,
+                    minScale: 1,
+                    boundaryMargin: const EdgeInsets.all(double.infinity),
+                    child: imageToShow!),
               ),
               const SizedBox(
                 height: 32,
@@ -138,7 +142,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-      side: SideType.selfie,
+      side: SideType.frontSide,
       country: CountryType.colombia,
       skipValidation: skipValidation,
       onImageCallback: (

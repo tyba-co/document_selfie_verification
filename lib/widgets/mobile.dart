@@ -16,7 +16,9 @@ class Mobile extends DocumentSelfieVerificationState {
       } else {
         Timer(const Duration(seconds: 4), () {
           showID = false;
-          setState(() {});
+          if (mounted) {
+            setState(() {});
+          }
         });
       }
     });
@@ -65,8 +67,9 @@ class Mobile extends DocumentSelfieVerificationState {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            !widget.side.isSelfie ? Colors.transparent : const Color(0xff28363e),
+        backgroundColor: !widget.side.isSelfie
+            ? Colors.transparent
+            : const Color(0xff28363e),
         leading: IconButton(
           key: const Key('back_button'),
           icon: const Icon(
