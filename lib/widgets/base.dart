@@ -104,19 +104,17 @@ abstract class DocumentSelfieVerificationState
         numberOfTextMatches: widget.numberOfTextMatches,
       );
 
-      (Uint8List, DocumentSelfieException?) response;
-      if (widget.side.isSelfie) {
-        response = await handleSelfieStream(
-            documentSelfieVerificationStream, availableImage);
-      } else {
-        response = await handleDocumentStream(
-            documentSelfieVerificationStream, availableImage);
-      }
+      (Uint8List, DocumentSelfieException?) response = widget.side.isSelfie
+          ? await handleSelfieStream(
+              documentSelfieVerificationStream,
+              availableImage,
+            )
+          : await handleDocumentStream(
+              documentSelfieVerificationStream,
+              availableImage,
+            );
 
       if (response.$2 == null) {
-        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-          DeviceOrientation.portraitUp,
-        ]);
         widget.onImageCallback(
           response.$1,
           exception: response.$2,
@@ -269,6 +267,11 @@ abstract class DocumentSelfieVerificationState
 
   @override
   void dispose() {
+    if (!widget.side.isSelfie) {
+      unawaited(SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+        DeviceOrientation.portraitUp,
+      ]));
+    }
     controller?.dispose();
     timer.cancel();
     super.dispose();
@@ -316,16 +319,11 @@ abstract class DocumentSelfieVerificationState
       keyWords: widget.keyWords,
       numberOfTextMatches: widget.numberOfTextMatches,
     );
+
     attempsToSkipValidationCounter++;
-    (Uint8List, DocumentSelfieException?) response;
-    if (widget.side.isSelfie) {
-      response = await handleSelfie(document);
-    } else {
-      response = await handleDocument(document);
-      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]);
-    }
+    (Uint8List, DocumentSelfieException?) response = widget.side.isSelfie
+        ? await handleSelfie(document)
+        : await handleDocument(document);
 
     closeLoading();
     widget.onImageCallback(response.$1, exception: response.$2);

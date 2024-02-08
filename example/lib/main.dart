@@ -147,7 +147,6 @@ class _ExampleWidgetState extends State<ExampleWidget> {
         DocumentSelfieException? exception,
       }) {
         counter++;
-        print('EmojiType? emoji, $emoji');
         if (exception != null && !skipValidation) {
           this.exception = exception;
         }
