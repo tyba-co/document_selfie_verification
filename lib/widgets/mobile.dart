@@ -83,7 +83,7 @@ class Mobile extends DocumentSelfieVerificationState {
       extendBodyBehindAppBar: true,
       body: !widget.side.isSelfie
           ? Stack(
-              children: [
+              children: <Widget>[
                 SizedBox(
                   width: width,
                   height: height,
@@ -95,12 +95,13 @@ class Mobile extends DocumentSelfieVerificationState {
                       child: GestureDetector(
                         onTapUp: onTapUp,
                         child: CustomPaint(
-                            painter:
-                                DocumentPainter(Colors.black.withOpacity(0.6)),
-                            size: Size(
-                              double.infinity,
-                              height,
-                            )),
+                          painter:
+                              DocumentPainter(Colors.black.withOpacity(0.6)),
+                          size: Size(
+                            double.infinity,
+                            height,
+                          ),
+                        ),
                       ),
                     ),
                     ColoredBox(
@@ -127,7 +128,7 @@ class Mobile extends DocumentSelfieVerificationState {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 Positioned(
@@ -150,75 +151,81 @@ class Mobile extends DocumentSelfieVerificationState {
                           showModal = !showModal;
                           setState(() {});
 
-                          showDialog<void>(
-                              barrierDismissible: true,
-                              useRootNavigator: true,
-                              barrierColor: Colors.transparent,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: Center(
-                                      child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxHeight: height,
-                                      maxWidth: width,
+                          await showDialog<void>(
+                            barrierDismissible: true,
+                            useRootNavigator: true,
+                            barrierColor: Colors.transparent,
+                            context: context,
+                            builder: (BuildContext context) => Material(
+                              color: Colors.transparent,
+                              child: Center(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: height,
+                                    maxWidth: width,
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      left: 30,
+                                      right: 100 + marginBottom,
                                     ),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 100 + marginBottom),
-                                      child: Center(
-                                          child: DecoratedBox(
+                                    child: Center(
+                                      child: DecoratedBox(
                                         decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            color:
-                                                Colors.black.withOpacity(0.6)),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          color: Colors.black.withOpacity(0.6),
+                                        ),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
+                                          padding: const EdgeInsets.all(16),
                                           child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: <Widget>[
-                                                    const Icon(
-                                                      Icons.info_outline,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  const Icon(
+                                                    Icons.info_outline,
+                                                    color: Colors.white,
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Text(
+                                                    '''Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento''',
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       color: Colors.white,
                                                     ),
-                                                    const SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    Text(
-                                                        'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color:
-                                                                Colors.white))
-                                                  ],
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(
+                                                height: 8,
+                                              ),
+                                              const Text(
+                                                '''• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.''',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
                                                 ),
-                                                const SizedBox(
-                                                  height: 8,
-                                                ),
-                                                const Text(
-                                                    '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white)),
-                                              ]),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      )),
+                                      ),
                                     ),
-                                  )),
-                                );
-                              });
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
 
                           Timer(
                             const Duration(seconds: 3),
@@ -249,8 +256,12 @@ class Mobile extends DocumentSelfieVerificationState {
                       height: 40,
                       width: 40,
                       decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5)),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1.5,
+                        ),
+                      ),
                     ),
                   ),
               ],
@@ -258,7 +269,7 @@ class Mobile extends DocumentSelfieVerificationState {
           : Padding(
               padding: EdgeInsets.only(top: appBarHeight),
               child: Stack(
-                children: [
+                children: <Widget>[
                   SizedBox(
                     width: width,
                     height: bodyHeight,
@@ -267,12 +278,14 @@ class Mobile extends DocumentSelfieVerificationState {
                   GestureDetector(
                     onTapUp: onTapUp,
                     child: CustomPaint(
-                        painter: SelfiePainter(
-                            const Color(0xff28363E).withOpacity(0.6)),
-                        size: Size(
-                          width,
-                          bodyHeight,
-                        )),
+                      painter: SelfiePainter(
+                        const Color(0xff28363E).withOpacity(0.6),
+                      ),
+                      size: Size(
+                        width,
+                        bodyHeight,
+                      ),
+                    ),
                   ),
                   Positioned.fill(
                     child: Column(
@@ -322,9 +335,12 @@ class Mobile extends DocumentSelfieVerificationState {
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border:
-                                Border.all(color: Colors.white, width: 1.5)),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1.5,
+                          ),
+                        ),
                       ),
                     ),
                 ],

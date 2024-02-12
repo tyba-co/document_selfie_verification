@@ -19,14 +19,14 @@ const List<String> backDNICO = <String>[
 const List<String> frontDNIPE = <String>[
   'republica',
   'fecha caducidad',
-  '<<'
+  '<<',
 ];
 
 const List<String> backDNIPE = <String>[
   'departamento',
   'indice',
   'direccion',
-  '<<'
+  '<<',
 ];
 
 const List<String> frontDNICL = <String>[

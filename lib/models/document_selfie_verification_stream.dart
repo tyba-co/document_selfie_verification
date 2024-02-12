@@ -30,19 +30,24 @@ class DocumentSelfieVerificationStream extends DocumentVerificationBase {
     DeviceOrientation.landscapeRight: 270,
   };
 
-  InputImage? inputImageFromCameraImage(CameraImage image,
-      CameraDescription cameraDescription, CameraController controller) {
+  InputImage? inputImageFromCameraImage(
+    CameraImage image,
+    CameraDescription cameraDescription,
+    CameraController controller,
+  ) {
     // get image rotation
     // it is used in android to convert the InputImage from Dart to Java
-    // `rotation` is not used in iOS to convert the InputImage from Dart to Obj-C
-    // in both platforms `rotation` and `camera.lensDirection` can be used to compensate `x` and `y` coordinates on a canvas
+    // `rotation` is not used in iOS to
+    //convert the InputImage from Dart to Obj-C
+    // in both platforms `rotation` and `camera.lensDirection`
+    //can be used to compensate `x` and `y` coordinates on a canvas
 
-    final sensorOrientation = cameraDescription.sensorOrientation;
+    int sensorOrientation = cameraDescription.sensorOrientation;
     InputImageRotation? rotation;
     if (Platform.isIOS) {
       rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
     } else if (Platform.isAndroid) {
-      var rotationCompensation =
+      int? rotationCompensation =
           orientations[controller.value.deviceOrientation];
       if (rotationCompensation == null) return null;
       if (cameraDescription.lensDirection == CameraLensDirection.front) {
@@ -58,7 +63,8 @@ class DocumentSelfieVerificationStream extends DocumentVerificationBase {
     if (rotation == null) return null;
 
     // get image format
-    final format = InputImageFormatValue.fromRawValue(image.format.raw);
+    InputImageFormat? format =
+        InputImageFormatValue.fromRawValue(image.format.raw);
     // validate format depending on platform
     // only supported formats:
     // * nv21 for Android
@@ -69,7 +75,7 @@ class DocumentSelfieVerificationStream extends DocumentVerificationBase {
 
     // since format is constraint to nv21 or bgra8888, both only have one plane
     if (image.planes.length != 1) return null;
-    final plane = image.planes.first;
+    Plane plane = image.planes.first;
 
     // compose InputImage using bytes
     return InputImage.fromBytes(
