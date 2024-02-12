@@ -7,8 +7,7 @@ class DocumentPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint();
-    paint.color = color;
+    Paint paint = Paint()..color = color;
 
     Paint cornersCombine = Paint()
       ..color = Colors.white
@@ -21,8 +20,15 @@ class DocumentPainter extends CustomPainter {
       Path.combine(
         PathOperation.difference,
         Path()
-          ..addRRect(RRect.fromLTRBR(
-              0, 0, size.width, size.height, const Radius.circular(0))),
+          ..addRRect(
+            RRect.fromLTRBR(
+              0,
+              0,
+              size.width,
+              size.height,
+              const Radius.circular(0),
+            ),
+          ),
         Path()
           ..addRRect(
             RRect.fromLTRBR(
@@ -39,66 +45,67 @@ class DocumentPainter extends CustomPainter {
     );
 
     Path baseCorners = Path.combine(
-        PathOperation.difference,
-        Path()
-          ..addRRect(
-            RRect.fromLTRBR(
-              124,
-              44,
-              size.width - 96,
-              size.height - 44,
-              const Radius.circular(10),
-            ),
+      PathOperation.difference,
+      Path()
+        ..addRRect(
+          RRect.fromLTRBR(
+            124,
+            44,
+            size.width - 96,
+            size.height - 44,
+            const Radius.circular(10),
           ),
-        Path()
-          ..addRRect(
-            RRect.fromLTRBR(
-              124 + 4,
-              44 + 4,
-              size.width - (96 + 4),
-              size.height - (44 + 4),
-              const Radius.circular(10),
-            ),
-          )
-          ..close());
+        ),
+      Path()
+        ..addRRect(
+          RRect.fromLTRBR(
+            124 + 4,
+            44 + 4,
+            size.width - (96 + 4),
+            size.height - (44 + 4),
+            const Radius.circular(10),
+          ),
+        )
+        ..close(),
+    );
 
     Path removeVerticalLines = Path.combine(
-        PathOperation.difference,
-        baseCorners,
-        Path()
-          ..addRRect(
-            RRect.fromLTRBR(
-              124 + cornerValue,
-              44,
-              size.width - (96 + cornerValue),
-              size.height - 44,
-              const Radius.circular(0),
-            ),
-          )
-          ..close());
+      PathOperation.difference,
+      baseCorners,
+      Path()
+        ..addRRect(
+          RRect.fromLTRBR(
+            124 + cornerValue,
+            44,
+            size.width - (96 + cornerValue),
+            size.height - 44,
+            const Radius.circular(0),
+          ),
+        )
+        ..close(),
+    );
 
     Path removeHorizontalLines = Path.combine(
-        PathOperation.difference,
-        removeVerticalLines,
-        Path()
-          ..addRRect(
-            RRect.fromLTRBR(
-              124,
-              44 + cornerValue,
-              size.width - 96,
-              size.height - (44 + cornerValue),
-              const Radius.circular(0),
-            ),
-          )
-          ..close());
+      PathOperation.difference,
+      removeVerticalLines,
+      Path()
+        ..addRRect(
+          RRect.fromLTRBR(
+            124,
+            44 + cornerValue,
+            size.width - 96,
+            size.height - (44 + cornerValue),
+            const Radius.circular(0),
+          ),
+        )
+        ..close(),
+    );
 
     canvas.drawPath(removeHorizontalLines, cornersCombine);
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
-  }
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class SelfiePainter extends CustomPainter {
@@ -108,8 +115,7 @@ class SelfiePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    paint.color = color;
+    Paint paint = Paint()..color = color;
     canvas.drawPath(
       Path.combine(
         PathOperation.difference,
@@ -149,8 +155,7 @@ class CicularButtonPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    paint.color = color;
+    Paint paint = Paint()..color = color;
 
     Path path = Path.combine(
       PathOperation.difference,
@@ -177,16 +182,17 @@ class CicularButtonPainter extends CustomPainter {
     canvas
       ..drawPath(path, paint)
       ..drawPath(
-          Path()
-            ..addOval(
-              const Rect.fromLTRB(
-                10,
-                10,
-                40 + 15,
-                40 + 15,
-              ),
+        Path()
+          ..addOval(
+            const Rect.fromLTRB(
+              10,
+              10,
+              40 + 15,
+              40 + 15,
             ),
-          paint);
+          ),
+        paint,
+      );
   }
 
   @override

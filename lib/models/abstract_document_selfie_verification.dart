@@ -31,10 +31,14 @@ abstract class DocumentVerificationBase {
     ),
   );
 
-  Future<MLTextResponse> checkMLText(
-      {InputImage? inputImage, File? file}) async {
-    assert(inputImage != null || file != null,
-        "at least one must be different from null");
+  Future<MLTextResponse> checkMLText({
+    InputImage? inputImage,
+    File? file,
+  }) async {
+    assert(
+      inputImage != null || file != null,
+      'at least one must be different from null',
+    );
 
     TextRecognizer textRecognizer = TextRecognizer();
     InputImage imageToProcess = inputImage ?? InputImage.fromFile(file!);
@@ -44,17 +48,23 @@ abstract class DocumentVerificationBase {
     List<TextBlock> blocks = recognisedText.blocks;
 
     MLTextResponse mlResponse = MLTextResponse(
-        blocks: blocks,
-        keyWords: keyWordsToValidate,
-        numberOfTextMatches: numberOfTextMatches);
+      blocks: blocks,
+      keyWords: keyWordsToValidate,
+      numberOfTextMatches: numberOfTextMatches,
+    );
 
     return mlResponse;
   }
 
-  Future<bool> validateFaces(
-      {int maxFaces = 2, InputImage? inputImage, File? file}) async {
-    assert(inputImage != null || file != null,
-        "at least one must be different from null");
+  Future<bool> validateFaces({
+    int maxFaces = 2,
+    InputImage? inputImage,
+    File? file,
+  }) async {
+    assert(
+      inputImage != null || file != null,
+      'at least one must be different from null',
+    );
     try {
       if (side == SideType.backSide) {
         return true;

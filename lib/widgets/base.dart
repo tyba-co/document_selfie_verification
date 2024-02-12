@@ -52,13 +52,14 @@ abstract class DocumentSelfieVerificationState
           : ImageFormatGroup.bgra8888,
     );
 
-    controller!.initialize().then((_) async {
+    await controller!.initialize().then((_) async {
       if (!mounted) {
         return;
       }
       timer = Timer(
         Duration(
-            seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
+          seconds: widget.skipValidation ? 0 : widget.secondsToShowButton,
+        ),
         switchAutomaticToOnDemand,
       );
 
@@ -75,8 +76,11 @@ abstract class DocumentSelfieVerificationState
       if (error is CameraException) {
         switch (error.code) {
           case 'CameraAccessDenied':
-            widget.onException(DocumentSelfieException(
-                DocumentSelfieExceptionType.cameraAccessDenied));
+            widget.onException(
+              DocumentSelfieException(
+                DocumentSelfieExceptionType.cameraAccessDenied,
+              ),
+            );
             break;
           default:
             widget.onError(error);
@@ -126,7 +130,7 @@ abstract class DocumentSelfieVerificationState
 
   Future<void> switchAutomaticToOnDemand() async {
     if (!widget.skipValidation) {
-      controller?.stopImageStream();
+      unawaited(controller?.stopImageStream());
     }
     showButton = true;
     setState(() {});
@@ -154,7 +158,8 @@ abstract class DocumentSelfieVerificationState
     bool checkMLText =
         await documentSelfieVerification.validateKeyWordsInFile();
     bool hasFaces = await documentSelfieVerification.validateFaces(
-        file: documentSelfieVerification.file);
+      file: documentSelfieVerification.file,
+    );
 
     if (checkMLText && hasFaces) {
       return (castToUin8List, null);
@@ -268,9 +273,11 @@ abstract class DocumentSelfieVerificationState
   @override
   void dispose() {
     if (!widget.side.isSelfie) {
-      unawaited(SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]));
+      unawaited(
+        SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+          DeviceOrientation.portraitUp,
+        ]),
+      );
     }
     controller?.dispose();
     timer.cancel();
@@ -294,7 +301,7 @@ abstract class DocumentSelfieVerificationState
     await controller!.setFocusPoint(point);
 
     setState(() {
-      Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+      Future<void>.delayed(const Duration(seconds: 1)).whenComplete(() {
         setState(() {
           showFocusCircle = false;
         });
@@ -377,7 +384,5 @@ abstract class DocumentSelfieVerificationState
   }
 
   @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
