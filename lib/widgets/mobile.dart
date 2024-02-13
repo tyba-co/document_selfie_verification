@@ -32,9 +32,9 @@ class Mobile extends DocumentSelfieVerificationState {
 
     String imageToRender = switch (widget.side) {
       SideType.frontSide when widget.country == CountryType.colombia =>
-        frontLeft,
+        frontRight,
       SideType.backSide => backImage,
-      SideType.frontSide => frontRight,
+      SideType.frontSide => frontLeft,
       _ => frontLeft,
     };
 
