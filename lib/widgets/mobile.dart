@@ -1,7 +1,6 @@
 part of document_selfie_verification.widgets;
 
 class Mobile extends DocumentSelfieVerificationState {
-  bool showModal = false;
   bool showID = true;
 
   @override
@@ -222,11 +221,7 @@ class Mobile extends DocumentSelfieVerificationState {
 
                           Timer(
                             const Duration(seconds: 3),
-                            () {
-                              showModal = !showModal;
-                              setState(() {});
-                              Navigator.of(context).pop();
-                            },
+                            closeInfoModal,
                           );
                         },
                       ),

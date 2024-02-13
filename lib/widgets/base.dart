@@ -11,6 +11,7 @@ abstract class DocumentSelfieVerificationState
   int attempsToSkipValidationCounter = 0;
   bool showFocusCircle = false;
   bool showButton = false;
+  bool showModal = false;
   double x = 0;
   double y = 0;
   late Logger logger;
@@ -115,6 +116,8 @@ abstract class DocumentSelfieVerificationState
             );
 
       if (response.$2 == null) {
+        closeInfoModal();
+
         widget.onImageCallback(
           response.$1,
           exception: response.$2,
@@ -122,6 +125,14 @@ abstract class DocumentSelfieVerificationState
         );
       }
     });
+  }
+
+  void closeInfoModal() {
+    if (showModal && mounted) {
+      showModal = !showModal;
+      setState(() {});
+      Navigator.of(context).pop();
+    }
   }
 
   Future<void> switchAutomaticToOnDemand() async {
