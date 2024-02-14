@@ -108,13 +108,13 @@ class Mobile extends DocumentSelfieVerificationState {
                         width: 100 + marginBottom,
                         height: height,
                         child: Center(
-                          child: InkWell(
-                            onTap: takePhoto,
-                            child: Visibility(
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
-                              visible: showButton,
+                          child: Visibility(
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            visible: showButton,
+                            child: InkWell(
+                              onTap: takePhoto,
                               child: CustomPaint(
                                 painter: CicularButtonPainter(Colors.white),
                                 size: const Size(
@@ -287,13 +287,13 @@ class Mobile extends DocumentSelfieVerificationState {
                         const SizedBox(
                           height: 40,
                         ),
-                        InkWell(
-                          onTap: takePhoto,
-                          child: Visibility(
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            visible: showButton,
+                        Visibility(
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          visible: showButton,
+                          child: InkWell(
+                            onTap: takePhoto,
                             child: CustomPaint(
                               painter: CicularButtonPainter(Colors.white),
                               size: const Size(

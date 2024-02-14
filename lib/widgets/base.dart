@@ -289,28 +289,32 @@ abstract class DocumentSelfieVerificationState
   }
 
   Future<void> onTapUp(TapUpDetails details) async {
-    showFocusCircle = true;
-    x = details.localPosition.dx;
-    y = details.localPosition.dy;
+    try {
+      showFocusCircle = true;
+      x = details.localPosition.dx;
+      y = details.localPosition.dy;
 
-    double fullWidth = MediaQuery.of(context).size.width;
-    double cameraHeight = fullWidth * controller!.value.aspectRatio;
+      double fullWidth = MediaQuery.of(context).size.width;
+      double cameraHeight = fullWidth * controller!.value.aspectRatio;
 
-    double xp = x / fullWidth;
-    double yp = y / cameraHeight;
+      double xp = x / fullWidth;
+      double yp = y / cameraHeight;
 
-    Offset point = Offset(xp, yp);
+      Offset point = Offset(xp, yp);
 
-    await controller!.setExposurePoint(point);
-    await controller!.setFocusPoint(point);
-
-    setState(() {
-      Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-        setState(() {
-          showFocusCircle = false;
+      await controller?.setExposurePoint(point);
+      await controller?.setFocusPoint(point);
+      setState(() {
+        Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+          setState(() {
+            showFocusCircle = false;
+          });
         });
       });
-    });
+    } on Exception catch (_, __) {
+      showFocusCircle = false;
+      setState(() {});
+    }
   }
 
   Future<void> takePhoto() async {
