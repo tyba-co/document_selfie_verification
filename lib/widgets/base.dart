@@ -117,6 +117,11 @@ abstract class DocumentSelfieVerificationState
 
       if (response.$2 == null) {
         closeInfoModal();
+        if (!widget.side.isSelfie) {
+          await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+            DeviceOrientation.portraitUp,
+          ]);
+        }
 
         widget.onImageCallback(
           response.$1,
@@ -278,11 +283,6 @@ abstract class DocumentSelfieVerificationState
 
   @override
   void dispose() {
-    if (!widget.side.isSelfie) {
-      unawaited(SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-      ]));
-    }
     controller?.dispose();
     timer.cancel();
     super.dispose();
@@ -341,6 +341,11 @@ abstract class DocumentSelfieVerificationState
         : await handleDocument(document);
 
     closeLoading();
+    if (!widget.side.isSelfie) {
+      await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+        DeviceOrientation.portraitUp,
+      ]);
+    }
     widget.onImageCallback(
       response.$1,
       exception: response.$2,

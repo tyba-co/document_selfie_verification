@@ -8,6 +8,7 @@ Future<void> main() async {
 
   await setPortrait();
   runApp(const MaterialApp(
+    showPerformanceOverlay: true,
     home: ExampleWidget(),
   ));
 }
@@ -31,6 +32,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
   DocumentSelfieException? exception;
   late Logger logger;
   int counter = 0;
+  bool imageLoading = false;
 
   bool get hasImage => imageToShow != null;
   bool get skipValidation => counter >= 3;
@@ -44,12 +46,13 @@ class _ExampleWidgetState extends State<ExampleWidget> {
   void reset() {
     exception = null;
     imageToShow = null;
+    imageLoading = false;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (hasImage) {
+    if (imageLoading) {
       return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -68,10 +71,11 @@ class _ExampleWidgetState extends State<ExampleWidget> {
               SizedBox(
                 height: 300,
                 child: InteractiveViewer(
-                    maxScale: 5,
-                    minScale: 1,
-                    boundaryMargin: const EdgeInsets.all(double.infinity),
-                    child: imageToShow!),
+                  maxScale: 5,
+                  minScale: 1,
+                  boundaryMargin: const EdgeInsets.all(double.infinity),
+                  child: imageToShow ?? const SizedBox.shrink(),
+                ),
               ),
               const SizedBox(
                 height: 32,
@@ -150,12 +154,20 @@ class _ExampleWidgetState extends State<ExampleWidget> {
         EmojiType? emoji,
         DocumentSelfieException? exception,
       }) {
+        imageLoading = true;
+        setState(() {});
         counter++;
         if (exception != null && !skipValidation) {
           this.exception = exception;
         }
-        imageToShow = Image.memory(imageConvert);
-        setState(() {});
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          imageToShow = Image.memory(
+            imageConvert,
+            scale: 0.5,
+          );
+          setState(() {});
+        });
       },
       onException: (DocumentSelfieException e) {
         logger.i('onException $e');
