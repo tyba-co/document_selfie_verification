@@ -283,6 +283,9 @@ abstract class DocumentSelfieVerificationState
 
   @override
   void dispose() {
+    if (controller?.value.isStreamingImages ?? false) {
+      controller!.stopImageStream();
+    }
     controller?.dispose();
     timer.cancel();
     super.dispose();
