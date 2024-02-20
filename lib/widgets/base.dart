@@ -12,6 +12,7 @@ abstract class DocumentSelfieVerificationState
   bool showFocusCircle = false;
   bool showButton = false;
   bool showModal = false;
+  bool isDispose = false;
   double x = 0;
   double y = 0;
   late Logger logger;
@@ -281,13 +282,17 @@ abstract class DocumentSelfieVerificationState
     );
   }
 
-  @override
-  void dispose() {
+  void close() {
     if (controller?.value.isStreamingImages ?? false) {
       controller!.stopImageStream();
     }
     controller?.dispose();
     timer.cancel();
+  }
+
+  @override
+  void dispose() {
+    close();
     super.dispose();
   }
 

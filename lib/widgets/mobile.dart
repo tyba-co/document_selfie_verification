@@ -47,7 +47,7 @@ class Mobile extends DocumentSelfieVerificationState {
 
   @override
   Widget build(BuildContext context) {
-    if (!(controller?.value.isInitialized ?? false)) {
+    if (!(controller?.value.isInitialized ?? false) && !isDispose) {
       return widget.loadingWidget ??
           const Center(
             child: CircularProgressIndicator(),
@@ -76,7 +76,17 @@ class Mobile extends DocumentSelfieVerificationState {
             color: Colors.white,
             size: 24,
           ),
-          onPressed: widget.onPressBackButton,
+          onPressed: () async {
+            isDispose = true;
+            setState(() {});
+            if (!widget.side.isSelfie) {
+              await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+                DeviceOrientation.portraitUp,
+              ]);
+            }
+
+            widget.onPressBackButton?.call();
+          },
         ),
       ),
       extendBodyBehindAppBar: true,
