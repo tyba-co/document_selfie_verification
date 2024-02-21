@@ -13,6 +13,7 @@ abstract class DocumentSelfieVerificationState
   bool showButton = false;
   bool showModal = false;
   bool isDispose = false;
+  bool isProcessing = false;
   double x = 0;
   double y = 0;
   late Logger logger;
@@ -90,10 +91,10 @@ abstract class DocumentSelfieVerificationState
 
   Future<void> startStream(CameraDescription cameraDescription) async {
     await controller!.startImageStream((CameraImage availableImage) async {
-      imageCounter++;
-      if (imageCounter % widget.streamFramesToSkipValidation != 0) {
+      if (isProcessing) {
         return;
       }
+      isProcessing = true;
 
       DocumentSelfieVerificationStream documentSelfieVerificationStream =
           DocumentSelfieVerificationStream(
