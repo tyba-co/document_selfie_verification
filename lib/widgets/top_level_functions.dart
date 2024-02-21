@@ -1,7 +1,9 @@
 part of document_selfie_verification.widgets;
 
-Future<Uint8List?> streamSelfieImageConverter(
-    CameraImage availableImage) async {
+Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
+  CameraImage availableImage = args[0];
+  RootIsolateToken rootIsolateToken = args[1];
+  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
   Uint8List? imageConvert;
   if (Platform.isAndroid) {
     imageConvert = await ConvertNativeImgStream().convertImgToBytes(
@@ -25,20 +27,26 @@ Future<Uint8List?> streamSelfieImageConverter(
   return imageConvert;
 }
 
-Future<Uint8List?> streamDocumentImageConverter(
-        CameraImage availableImage) async =>
-    await ConvertNativeImgStream().convertImgToBytes(
-      availableImage.planes.first.bytes,
-      availableImage.width,
-      availableImage.height,
-      rotationFix: -360,
-    );
+Future<Uint8List?> streamDocumentImageConverter(List<dynamic> args) async {
+  CameraImage availableImage = args[0];
+  RootIsolateToken rootIsolateToken = args[1];
+  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+  return await ConvertNativeImgStream().convertImgToBytes(
+    availableImage.planes.first.bytes,
+    availableImage.width,
+    availableImage.height,
+    rotationFix: -360,
+  );
+}
 
 mlkit.InputImage? inputImageFromCameraImage(List<dynamic> args) {
   CameraImage image = args[0];
 
   CameraDescription cameraDescription = args[1];
   DeviceOrientation deviceOrientation = args[2];
+  RootIsolateToken rootIsolateToken = args[3];
+  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
 
   // get image rotation
   // it is used in android to convert the InputImage from Dart to Java
