@@ -146,8 +146,9 @@ abstract class DocumentSelfieVerificationState
   }
 
   Future<void> switchAutomaticToOnDemand() async {
-    if (!widget.skipValidation) {
-      controller?.stopImageStream();
+    bool isStreamingImages = controller?.value.isStreamingImages ?? false;
+    if (!widget.skipValidation && isStreamingImages) {
+      controller!.stopImageStream();
     }
     showButton = true;
     setState(() {});
