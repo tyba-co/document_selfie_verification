@@ -131,6 +131,7 @@ abstract class DocumentSelfieVerificationState
           emoji: emoji,
         );
       }
+      isProcessing = false;
     });
   }
 
@@ -188,20 +189,23 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
+    mlkit.InputImage? inputImage = await compute(
+        inputImageFromCameraImage, <dynamic>[
+      availableImage,
+      cameraDescription,
+      controller!.value.deviceOrientation
+    ]);
+
     MLTextResponse checkMLText =
         await documentSelfieVerificationStream.checkMLText(
-      inputImage: documentSelfieVerificationStream.inputImage,
+      inputImage: inputImage,
     );
     bool hasFaces = await documentSelfieVerificationStream.validateFaces(
-      inputImage: documentSelfieVerificationStream.inputImage,
+      inputImage: inputImage,
     );
 
-    Uint8List? imageConvert = await ConvertNativeImgStream().convertImgToBytes(
-      availableImage.planes.first.bytes,
-      availableImage.width,
-      availableImage.height,
-      rotationFix: -360,
-    );
+    Uint8List? imageConvert =
+        await compute(streamDocumentImageConverter, availableImage);
 
     if (checkMLText.success && hasFaces) {
       return (imageConvert!, null);
@@ -224,31 +228,20 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
+    mlkit.InputImage? inputImage = await compute(
+        inputImageFromCameraImage, <dynamic>[
+      availableImage,
+      cameraDescription,
+      controller!.value.deviceOrientation
+    ]);
+
     bool isValid = await documentSelfieVerificationStream.validateFaces(
       maxFaces: 1,
-      inputImage: documentSelfieVerificationStream.inputImage,
+      inputImage: inputImage,
     );
 
-    Uint8List? imageConvert;
-    if (Platform.isAndroid) {
-      imageConvert = await ConvertNativeImgStream().convertImgToBytes(
-        availableImage.planes.first.bytes,
-        availableImage.width,
-        availableImage.height,
-        rotationFix: -90,
-      );
-    } else {
-      Plane plane = availableImage.planes.first;
-      imglib.Image image = imglib.Image.fromBytes(
-        width: availableImage.width,
-        height: availableImage.height,
-        bytes: plane.bytes.buffer,
-        rowStride: plane.bytesPerRow,
-        order: imglib.ChannelOrder.bgra,
-      );
-
-      imageConvert = imglib.encodeJpg(image);
-    }
+    Uint8List? imageConvert =
+        await compute(streamSelfieImageConverter, availableImage);
 
     if (isValid) {
       return (imageConvert!, null);

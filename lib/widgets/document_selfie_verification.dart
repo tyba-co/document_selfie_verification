@@ -7,7 +7,6 @@ class DocumentSelfieVerification extends StatefulWidget {
     required this.country,
     required this.onException,
     required this.onError,
-    this.streamFramesToSkipValidation = 50,
     this.secondsToShowButton = 10,
     this.skipValidation = false,
     this.numberOfTextMatches = 2,
@@ -18,7 +17,6 @@ class DocumentSelfieVerification extends StatefulWidget {
   });
   final SideType side;
   final CountryType country;
-  final int streamFramesToSkipValidation;
   final int secondsToShowButton;
   final bool skipValidation;
   final int numberOfTextMatches;
