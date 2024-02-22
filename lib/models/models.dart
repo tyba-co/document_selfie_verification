@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
-import 'package:flutter/services.dart';
 
 import '../constants/constants.dart';
 import '../js/text_and_image_processing_web.dart';

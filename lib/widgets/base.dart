@@ -61,18 +61,24 @@ abstract class DocumentSelfieVerificationState
       if (!mounted) {
         return;
       }
-      timer = Timer(
-        Duration(
-            seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
-        switchAutomaticToOnDemand,
-      );
 
       await controller!.setFlashMode(FlashMode.off);
       await controller!.setFocusMode(FocusMode.auto);
       await rotateCamera(controller!);
 
       if (!widget.skipValidation) {
-        await startStream(cameraDescription);
+        /* TODO: Ricardo  When the camera starts up it starts dark, 
+         after a few frames it converts to a color image
+        */
+        Future.delayed(Duration(seconds: widget.timeToStartImageProcess), () {
+          timer = Timer(
+            Duration(
+                seconds:
+                    widget.skipValidation ? 0 : widget.secondsToShowButton),
+            switchAutomaticToOnDemand,
+          );
+          startStream(cameraDescription);
+        });
       }
 
       setState(() {});
@@ -91,8 +97,8 @@ abstract class DocumentSelfieVerificationState
     });
   }
 
-  Future<void> startStream(CameraDescription cameraDescription) async {
-    await controller!.startImageStream((CameraImage availableImage) async {
+  void startStream(CameraDescription cameraDescription) {
+    controller!.startImageStream((CameraImage availableImage) async {
       if (isProcessing) {
         return;
       }
