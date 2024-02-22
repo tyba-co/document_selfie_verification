@@ -68,7 +68,8 @@ abstract class DocumentSelfieVerificationState
 
       int memory = await SystemInfoPlus.physicalMemory ?? 0;
       bool canInitStreamProcess = memory > widget.minPhysicalMemory;
-      if (!canInitStreamProcess) {
+
+      if (!canInitStreamProcess || widget.skipValidation) {
         showButton = true;
       }
 
