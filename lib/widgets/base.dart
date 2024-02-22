@@ -17,7 +17,7 @@ abstract class DocumentSelfieVerificationState
   double x = 0;
   double y = 0;
   late Logger logger;
-  late Timer timer;
+  Timer? timer;
   late CameraDescription cameraDescription;
   late EmojiType emoji;
   late RootIsolateToken? rootIsolateToken;
@@ -66,17 +66,18 @@ abstract class DocumentSelfieVerificationState
       await controller!.setFocusMode(FocusMode.auto);
       await rotateCamera(controller!);
 
-      if (!widget.skipValidation) {
+      int memory = await SystemInfoPlus.physicalMemory ?? 0;
+      bool canInitStreamProcess = memory > widget.minPhysicalMemory;
+      if (!canInitStreamProcess) {
+        showButton = true;
+      }
+
+      if (!widget.skipValidation && canInitStreamProcess) {
         /* TODO: Ricardo  When the camera starts up it starts dark, 
          after a few frames it converts to a color image
         */
-        Future.delayed(Duration(seconds: widget.timeToStartImageProcess), () {
-          timer = Timer(
-            Duration(
-                seconds:
-                    widget.skipValidation ? 0 : widget.secondsToShowButton),
-            switchAutomaticToOnDemand,
-          );
+        Future.delayed(Duration(seconds: widget.seconsToStartImageProcess), () {
+          setTimerToShowButton();
           startStream(cameraDescription);
         });
       }
@@ -95,6 +96,13 @@ abstract class DocumentSelfieVerificationState
         }
       }
     });
+  }
+
+  void setTimerToShowButton() {
+    timer = Timer(
+      Duration(seconds: widget.skipValidation ? 0 : widget.secondsToShowButton),
+      switchAutomaticToOnDemand,
+    );
   }
 
   void startStream(CameraDescription cameraDescription) {
@@ -295,7 +303,7 @@ abstract class DocumentSelfieVerificationState
       controller!.stopImageStream();
     }
     controller?.dispose();
-    timer.cancel();
+    timer?.cancel();
   }
 
   @override

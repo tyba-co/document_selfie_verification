@@ -10,7 +10,8 @@ class DocumentSelfieVerification extends StatefulWidget {
     this.secondsToShowButton = 10,
     this.skipValidation = false,
     this.numberOfTextMatches = 2,
-    this.timeToStartImageProcess = 3,
+    this.seconsToStartImageProcess = 3,
+    this.minPhysicalMemory = 3000,
     this.loadingWidget,
     this.keyWords,
     this.onPressBackButton,
@@ -21,7 +22,8 @@ class DocumentSelfieVerification extends StatefulWidget {
   final int secondsToShowButton;
   final bool skipValidation;
   final int numberOfTextMatches;
-  final int timeToStartImageProcess;
+  final int seconsToStartImageProcess;
+  final int minPhysicalMemory;
   final void Function(
     Uint8List, {
     EmojiType? emoji,

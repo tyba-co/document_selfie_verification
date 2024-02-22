@@ -66,7 +66,10 @@ DocumentSelfieVerification(
 | onError                 | void Function(Object)                                                           | A callback function that is invoked when error occurs                                                                                                                                                                         |
 | onException             | void Function(DocumentSelfieException) onException                              | A callback function that is invoked when exception occurs                                                                                                                                                                     |
 | onPressBackButton       | void Function()?                                                                | A callback function when tap ui back button                                                                                                                                                                                   |
-| timeToStartImageProcess | int > 0                                                                         | In order to improve the experience, a delay is added that allows the time to initialize image processing to be delayed.                                                                                                       |
+| secondsToShowButton | int > 0                                                                         | In order to improve the experience, a delay is added that allows the time to initialize image processing to be delayed.                                                                                                       |
+
+|
+| minPhysicalMemory | int > 0                                                                         | Min physical memory for Stream validation.                                                                                                       |
 
 |
 | loadingWidget | Widget? | An optional widget to display while the camera is initializing. If not provided, a default progress indicator will be displayed. |

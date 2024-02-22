@@ -149,7 +149,8 @@ class _ExampleWidgetState extends State<ExampleWidget> {
       side: SideType.frontSide,
       country: CountryType.colombia,
       skipValidation: skipValidation,
-      timeToStartImageProcess: 5,
+      minPhysicalMemory: 3000,
+      secondsToShowButton: 5,
       onImageCallback: (
         Uint8List imageConvert, {
         EmojiType? emoji,
