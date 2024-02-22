@@ -1,9 +1,16 @@
-part of document_selfie_verification.widgets;
+import 'dart:io';
+
+import 'package:camera/camera.dart';
+import 'package:convert_native_img_stream/convert_native_img_stream.dart';
+import 'package:flutter/services.dart';
+import 'package:google_ml_kit/google_ml_kit.dart' as mlkit;
+import 'package:image/image.dart' as imglib;
 
 Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
   CameraImage availableImage = args[0];
   RootIsolateToken rootIsolateToken = args[1];
   BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+
   Uint8List? imageConvert;
   if (Platform.isAndroid) {
     imageConvert = await ConvertNativeImgStream().convertImgToBytes(
@@ -30,8 +37,9 @@ Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
 Future<Uint8List?> streamDocumentImageConverter(List<dynamic> args) async {
   CameraImage availableImage = args[0];
   RootIsolateToken rootIsolateToken = args[1];
+
   BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+
   return await ConvertNativeImgStream().convertImgToBytes(
     availableImage.planes.first.bytes,
     availableImage.width,
