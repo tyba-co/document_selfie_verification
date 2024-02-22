@@ -1,6 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart' as mlkit;
 
+dynamic unifyThread(List<dynamic> args) async {
+  return throw UnsupportedError('unifyThread Unsupported');
+}
+
 Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
   return throw UnsupportedError('streamSelfieImageConverter Unsupported');
 }

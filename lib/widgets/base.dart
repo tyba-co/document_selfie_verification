@@ -198,13 +198,13 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
-    mlkit.InputImage? inputImage =
-        await compute(inputImageFromCameraImage, <dynamic>[
+    mlkit.InputImage? inputImage = await compute(unifyThread, <dynamic>[
+      'inputImageFromCameraImage',
       availableImage,
       cameraDescription,
       controller!.value.deviceOrientation,
       rootIsolateToken,
-    ]);
+    ]) as mlkit.InputImage?;
 
     MLTextResponse checkMLText =
         await documentSelfieVerificationStream.checkMLText(
@@ -214,11 +214,11 @@ abstract class DocumentSelfieVerificationState
       inputImage: inputImage,
     );
 
-    Uint8List? imageConvert =
-        await compute(streamDocumentImageConverter, <dynamic>[
+    Uint8List? imageConvert = await compute(unifyThread, <dynamic>[
+      'streamDocumentImageConverter',
       availableImage,
       rootIsolateToken,
-    ]);
+    ]) as Uint8List?;
 
     if (checkMLText.success && hasFaces) {
       return (imageConvert!, null);
@@ -241,21 +241,24 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
-    mlkit.InputImage? inputImage =
-        await compute(inputImageFromCameraImage, <dynamic>[
+    mlkit.InputImage? inputImage = await compute(unifyThread, <dynamic>[
+      'inputImageFromCameraImage',
       availableImage,
       cameraDescription,
       controller!.value.deviceOrientation,
       rootIsolateToken,
-    ]);
+    ]) as mlkit.InputImage?;
 
     bool isValid = await documentSelfieVerificationStream.validateFaces(
       maxFaces: 1,
       inputImage: inputImage,
     );
 
-    Uint8List? imageConvert = await compute(
-        streamSelfieImageConverter, [availableImage, rootIsolateToken]);
+    Uint8List? imageConvert = await compute(unifyThread, [
+      'streamSelfieImageConverter',
+      availableImage,
+      rootIsolateToken
+    ]) as Uint8List?;
 
     if (isValid) {
       return (imageConvert!, null);

@@ -6,6 +6,20 @@ import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart' as mlkit;
 import 'package:image/image.dart' as imglib;
 
+dynamic unifyThread(List<dynamic> args) async {
+  String type = args[0];
+
+  args.removeAt(0);
+
+  if (type == 'streamSelfieImageConverter') {
+    return await streamSelfieImageConverter(args);
+  } else if (type == 'streamDocumentImageConverter') {
+    return await streamDocumentImageConverter(args);
+  }
+
+  return await streamDocumentImageConverter(args);
+}
+
 Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
   CameraImage availableImage = args[0];
 
