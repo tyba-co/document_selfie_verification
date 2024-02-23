@@ -76,8 +76,10 @@ abstract class DocumentSelfieVerificationState
          after a few frames it converts to a color image
         */
         Future.delayed(Duration(seconds: widget.seconsToStartImageProcess), () {
-          setTimerToShowButton();
-          startStream(cameraDescription);
+          if (!isDispose) {
+            setTimerToShowButton();
+            startStream(cameraDescription);
+          }
         });
       }
 
