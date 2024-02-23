@@ -60,9 +60,13 @@ abstract class DocumentSelfieVerificationState
         return;
       }
 
-      await controller!.setFlashMode(FlashMode.off);
-      await controller!.setFocusMode(FocusMode.auto);
       await rotateCamera(controller!);
+      try {
+        await controller!.setFlashMode(FlashMode.off);
+        await controller!.setFocusMode(FocusMode.auto);
+      } catch (error) {
+        print('flash or Focus Error $error ');
+      }
 
       int memory = await SystemInfoPlus.physicalMemory ?? 0;
       bool canInitStreamProcess = memory > widget.minPhysicalMemory;
