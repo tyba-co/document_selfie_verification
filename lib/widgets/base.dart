@@ -20,11 +20,9 @@ abstract class DocumentSelfieVerificationState
   Timer? timer;
   late CameraDescription cameraDescription;
   late EmojiType emoji;
-  late RootIsolateToken? rootIsolateToken;
 
   @override
   void initState() {
-    rootIsolateToken = ServicesBinding.rootIsolateToken;
     logger = Logger();
     emoji = EmojiType.randomEmoji();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -207,13 +205,11 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
-    mlkit.InputImage? inputImage =
-        await compute(inputImageFromCameraImage, <dynamic>[
+    mlkit.InputImage? inputImage = inputImageFromCameraImage(
       availableImage,
       cameraDescription,
       controller!.value.deviceOrientation,
-      rootIsolateToken,
-    ]);
+    );
 
     MLTextResponse checkMLText =
         await documentSelfieVerificationStream.checkMLText(
@@ -224,10 +220,7 @@ abstract class DocumentSelfieVerificationState
     );
 
     Uint8List? imageConvert =
-        await compute(streamDocumentImageConverter, <dynamic>[
-      availableImage,
-      rootIsolateToken,
-    ]);
+        await streamDocumentImageConverter(availableImage);
 
     if (checkMLText.success && hasFaces) {
       return (imageConvert!, null);
@@ -250,21 +243,18 @@ abstract class DocumentSelfieVerificationState
     DocumentSelfieVerificationStream documentSelfieVerificationStream,
     CameraImage availableImage,
   ) async {
-    mlkit.InputImage? inputImage =
-        await compute(inputImageFromCameraImage, <dynamic>[
+    mlkit.InputImage? inputImage = inputImageFromCameraImage(
       availableImage,
       cameraDescription,
       controller!.value.deviceOrientation,
-      rootIsolateToken,
-    ]);
+    );
 
     bool isValid = await documentSelfieVerificationStream.validateFaces(
       maxFaces: 1,
       inputImage: inputImage,
     );
 
-    Uint8List? imageConvert = await compute(
-        streamSelfieImageConverter, [availableImage, rootIsolateToken]);
+    Uint8List? imageConvert = await streamSelfieImageConverter(availableImage);
 
     if (isValid) {
       return (imageConvert!, null);

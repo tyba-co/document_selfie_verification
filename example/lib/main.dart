@@ -146,11 +146,12 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-      side: SideType.frontSide,
+      side: SideType.selfie,
       country: CountryType.colombia,
       skipValidation: skipValidation,
       minPhysicalMemory: 3000,
-      secondsToShowButton: 5,
+      seconsToStartImageProcess: 3,
+      secondsToShowButton: 10,
       onImageCallback: (
         Uint8List imageConvert, {
         EmojiType? emoji,
