@@ -13,7 +13,7 @@ import '../models/models.dart';
 import '../enums/enums.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import '../top_level_functions/top_level_functions.dart';
+import '../top_level_functions.dart';
 
 part 'custom_paint.dart';
 part 'document_selfie_verification.dart';

@@ -6,11 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart' as mlkit;
 import 'package:image/image.dart' as imglib;
 
-Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
-  CameraImage availableImage = args[0];
-  RootIsolateToken rootIsolateToken = args[1];
-  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-
+Future<Uint8List?> streamSelfieImageConverter(
+    CameraImage availableImage) async {
   Uint8List? imageConvert;
   if (Platform.isAndroid) {
     imageConvert = await ConvertNativeImgStream().convertImgToBytes(
@@ -34,12 +31,8 @@ Future<Uint8List?> streamSelfieImageConverter(List<dynamic> args) async {
   return imageConvert;
 }
 
-Future<Uint8List?> streamDocumentImageConverter(List<dynamic> args) async {
-  CameraImage availableImage = args[0];
-  RootIsolateToken rootIsolateToken = args[1];
-
-  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-
+Future<Uint8List?> streamDocumentImageConverter(
+    CameraImage availableImage) async {
   return await ConvertNativeImgStream().convertImgToBytes(
     availableImage.planes.first.bytes,
     availableImage.width,
@@ -48,14 +41,11 @@ Future<Uint8List?> streamDocumentImageConverter(List<dynamic> args) async {
   );
 }
 
-mlkit.InputImage? inputImageFromCameraImage(List<dynamic> args) {
-  CameraImage image = args[0];
-
-  CameraDescription cameraDescription = args[1];
-  DeviceOrientation deviceOrientation = args[2];
-  RootIsolateToken rootIsolateToken = args[3];
-  BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
-
+mlkit.InputImage? inputImageFromCameraImage(
+  CameraImage image,
+  CameraDescription cameraDescription,
+  DeviceOrientation deviceOrientation,
+) {
   // get image rotation
   // it is used in android to convert the InputImage from Dart to Java
   // `rotation` is not used in iOS to convert the InputImage from Dart to Obj-C
