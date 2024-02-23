@@ -164,7 +164,9 @@ abstract class DocumentSelfieVerificationState
       controller!.stopImageStream();
     }
     showButton = true;
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<XFile?> getFile() async {
