@@ -63,8 +63,9 @@ abstract class DocumentSelfieVerificationState
 
       await rotateCamera(controller!);
 
-      await controller!.setFlashMode(FlashMode.off);
-      await controller!.setFocusMode(FocusMode.auto);
+      unawaited(controller?.setFlashMode(FlashMode.off));
+      unawaited(controller?.setFocusMode(FocusMode.auto));
+
       int memory = await SystemInfoPlus.physicalMemory ?? 0;
       bool canInitStreamProcess = memory > widget.minPhysicalMemory;
 
