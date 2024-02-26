@@ -9,6 +9,7 @@ abstract class DocumentSelfieVerificationState
   CameraController? controller;
   int imageCounter = 0;
   int attempsToSkipValidationCounter = 0;
+  int attempsToRotation = 0;
   bool showFocusCircle = false;
   bool showButton = false;
   bool showModal = false;
@@ -61,13 +62,9 @@ abstract class DocumentSelfieVerificationState
       }
 
       await rotateCamera(controller!);
-      try {
-        await controller!.setFlashMode(FlashMode.off);
-        await controller!.setFocusMode(FocusMode.auto);
-      } catch (error) {
-        print('flash or Focus Error $error ');
-      }
 
+      await controller!.setFlashMode(FlashMode.off);
+      await controller!.setFocusMode(FocusMode.auto);
       int memory = await SystemInfoPlus.physicalMemory ?? 0;
       bool canInitStreamProcess = memory > widget.minPhysicalMemory;
 
@@ -404,17 +401,24 @@ abstract class DocumentSelfieVerificationState
   }
 
   Future<void> rotateCamera(CameraController controller) async {
-    if (!widget.side.isSelfie) {
-      if (Platform.isIOS) {
-        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-          DeviceOrientation.landscapeRight,
-        ]);
-        await controller
-            .lockCaptureOrientation(DeviceOrientation.landscapeLeft);
-      } else {
-        await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-          DeviceOrientation.landscapeLeft,
-        ]);
+    attempsToRotation++;
+    try {
+      if (!widget.side.isSelfie) {
+        if (Platform.isIOS) {
+          await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+            DeviceOrientation.landscapeRight,
+          ]);
+          await controller
+              .lockCaptureOrientation(DeviceOrientation.landscapeLeft);
+        } else {
+          await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+            DeviceOrientation.landscapeLeft,
+          ]);
+        }
+      }
+    } catch (error) {
+      if (attempsToRotation <= 3) {
+        await rotateCamera(controller);
       }
     }
   }
