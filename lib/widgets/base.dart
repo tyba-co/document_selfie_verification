@@ -110,9 +110,17 @@ abstract class DocumentSelfieVerificationState
 
   void startStream(CameraDescription cameraDescription) {
     controller!.startImageStream((CameraImage availableImage) async {
-      if (isProcessing) {
+      imageCounter++;
+
+      /* TODO: Ricardo  by initializing the camera and starting the imageStream and then 
+         destroying the imageStream. When you initialize the imageStream again, it is
+         destroyed and starts with the last frame that was executed.
+      */
+      bool completeImageDelay = imageCounter % 10 != 0;
+      if (isProcessing || completeImageDelay) {
         return;
       }
+
       isProcessing = true;
 
       DocumentSelfieVerificationStream documentSelfieVerificationStream =
@@ -301,6 +309,7 @@ abstract class DocumentSelfieVerificationState
     }
     controller?.dispose();
     timer?.cancel();
+    imageCounter = 0;
   }
 
   @override
