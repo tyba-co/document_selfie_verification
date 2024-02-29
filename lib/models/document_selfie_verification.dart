@@ -25,6 +25,9 @@ class DocumentVerification extends DocumentVerificationBase {
 
   Future<bool> validateOneFace({int maxFaces = 2}) async {
     if (kIsWeb) {
+      if (side == SideType.backSide) {
+        return true;
+      }
       return await TextImageProcessingForWeb.instance
           .recognizePersonInPhoto(imageData!);
     }
