@@ -12,6 +12,8 @@ abstract class DocumentVerificationBase {
   SideType side;
   int numberOfTextMatches;
 
+  static EmojiType get emoji => EmojiType.randomEmoji();
+
   List<String> get defaultKeyWords => switch (country) {
         CountryType.chile when side.isFrontSide => frontDNICL,
         CountryType.chile when side.isBackSide => backDNICL,

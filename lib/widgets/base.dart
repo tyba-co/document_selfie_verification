@@ -25,7 +25,7 @@ abstract class DocumentSelfieVerificationState
   @override
   void initState() {
     logger = Logger();
-    emoji = EmojiType.randomEmoji();
+    emoji = DocumentVerificationBase.emoji;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       unawaited(
         SystemChrome.setEnabledSystemUIMode(
