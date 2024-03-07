@@ -66,6 +66,7 @@ class Mobile extends DocumentSelfieVerificationState {
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: !widget.side.isSelfie
             ? Colors.transparent
             : const Color(0xff28363e),
