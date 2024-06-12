@@ -46,9 +46,11 @@ abstract class DocumentVerificationBase {
     List<TextBlock> blocks = recognisedText.blocks;
 
     MLTextResponse mlResponse = MLTextResponse(
-        blocks: blocks,
-        keyWords: keyWordsToValidate,
-        numberOfTextMatches: numberOfTextMatches);
+      blocks: blocks,
+      keyWords: keyWordsToValidate,
+      numberOfTextMatches: numberOfTextMatches,
+      country: country,
+    );
 
     return mlResponse;
   }
