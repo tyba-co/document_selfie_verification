@@ -318,6 +318,12 @@ abstract class DocumentSelfieVerificationState
     super.dispose();
   }
 
+  @override
+  void setState(VoidCallback fn) {
+    if (!mounted) return;
+    super.setState(fn);
+  }
+
   Future<void> onTapUp(TapUpDetails details) async {
     try {
       showFocusCircle = true;
@@ -370,7 +376,9 @@ abstract class DocumentSelfieVerificationState
         ? await handleSelfie(document)
         : await handleDocument(document);
 
-    closeLoading();
+    if (mounted) {
+      closeLoading();
+    }
     if (!widget.side.isSelfie) {
       await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
         DeviceOrientation.portraitUp,
