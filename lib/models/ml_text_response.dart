@@ -5,15 +5,11 @@ class MLTextResponse {
     required this.blocks,
     required this.keyWords,
     required this.numberOfTextMatches,
-    required this.country,
   });
 
   List<TextBlock> blocks;
   List<String> keyWords;
   int numberOfTextMatches;
-  CountryType country;
-
-  bool get isPe => country == CountryType.peru;
 
   Map<String, dynamic> get blocksAndKeyword => keyWords.fold(
         {},
@@ -37,9 +33,6 @@ class MLTextResponse {
     if (blocks.isEmpty) {
       return false;
     }
-    if (!isPe) {
-      return true;
-    }
 
     TextBlock lastBlock = blocks.last;
     bool hasMRZCode = lastBlock.text.contains('<');
@@ -50,9 +43,9 @@ class MLTextResponse {
     int blockLength = blocks.length;
     List<TextBlock> mrzBlocks = blocks.sublist(blockLength - 3);
     bool isTD1 = mrzBlocks.length == 3;
-    bool allLinesHave20Char =
+    bool allLinesHave30Char =
         mrzBlocks.every((element) => element.text.length == 30);
-    return isTD1 && allLinesHave20Char;
+    return isTD1 && allLinesHave30Char;
   }
 
   bool get success {

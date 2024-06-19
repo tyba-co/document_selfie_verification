@@ -49,7 +49,6 @@ abstract class DocumentVerificationBase {
       blocks: blocks,
       keyWords: keyWordsToValidate,
       numberOfTextMatches: numberOfTextMatches,
-      country: country,
     );
 
     return mlResponse;
