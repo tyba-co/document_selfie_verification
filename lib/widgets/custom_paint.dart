@@ -17,6 +17,7 @@ class DocumentPainter extends CustomPainter {
 
     double cornerValue = 50;
 
+    canvas.drawColor(color, BlendMode.srcOver);
     canvas.drawPath(
       Path.combine(
         PathOperation.difference,
@@ -26,11 +27,11 @@ class DocumentPainter extends CustomPainter {
         Path()
           ..addRRect(
             RRect.fromLTRBR(
-              64,
-              32,
-              size.width - 32,
-              size.height - 32,
-              const Radius.circular(10),
+              0,
+              0,
+              size.width,
+              size.height,
+              const Radius.circular(0),
             ),
           )
           ..close(),
@@ -45,7 +46,7 @@ class DocumentPainter extends CustomPainter {
             RRect.fromLTRBR(
               124,
               44,
-              size.width - 96,
+              size.width,
               size.height - 44,
               const Radius.circular(10),
             ),
@@ -55,7 +56,7 @@ class DocumentPainter extends CustomPainter {
             RRect.fromLTRBR(
               124 + 4,
               44 + 4,
-              size.width - (96 + 4),
+              size.width - 4,
               size.height - (44 + 4),
               const Radius.circular(10),
             ),
@@ -70,7 +71,7 @@ class DocumentPainter extends CustomPainter {
             RRect.fromLTRBR(
               124 + cornerValue,
               44,
-              size.width - (96 + cornerValue),
+              size.width - cornerValue,
               size.height - 44,
               const Radius.circular(0),
             ),
@@ -85,7 +86,7 @@ class DocumentPainter extends CustomPainter {
             RRect.fromLTRBR(
               124,
               44 + cornerValue,
-              size.width - 96,
+              size.width,
               size.height - (44 + cornerValue),
               const Radius.circular(0),
             ),
