@@ -41,7 +41,7 @@ class Mobile extends DocumentSelfieVerificationState {
     return SvgPicture.asset(
       imageToRender,
       package: 'document_selfie_verification',
-      width: MediaQuery.of(context).size.width * 0.45,
+      width: MediaQuery.of(context).size.width * 0.5,
     );
   }
 
@@ -114,9 +114,9 @@ class Mobile extends DocumentSelfieVerificationState {
                       ),
                     ),
                     ColoredBox(
-                      color: const Color(0xff28363e),
+                      color: Colors.transparent,
                       child: SizedBox(
-                        width: 100 + marginBottom,
+                        width: width * 0.15,
                         height: height,
                         child: Center(
                           child: Visibility(
@@ -142,7 +142,7 @@ class Mobile extends DocumentSelfieVerificationState {
                 ),
                 Positioned(
                   bottom: 32,
-                  right: 100 + marginBottom + 30,
+                  right: 24,
                   child: CircleAvatar(
                     radius: 22,
                     backgroundColor:
@@ -169,69 +169,56 @@ class Mobile extends DocumentSelfieVerificationState {
                                 return Material(
                                   color: Colors.transparent,
                                   child: Center(
-                                      child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxHeight: height,
-                                      maxWidth: width,
-                                    ),
+                                      child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.black.withOpacity(0.6)),
                                     child: Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 30, right: 100 + marginBottom),
-                                      child: Center(
-                                          child: DecoratedBox(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            color:
-                                                Colors.black.withOpacity(0.6)),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Column(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisSize: MainAxisSize.min,
                                               children: <Widget>[
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: <Widget>[
-                                                    const Icon(
-                                                      Icons.info_outline,
-                                                      color: Colors.white,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    Text(
-                                                        'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            color:
-                                                                Colors.white))
-                                                  ],
+                                                const Icon(
+                                                  Icons.info_outline,
+                                                  color: Colors.white,
                                                 ),
                                                 const SizedBox(
-                                                  height: 8,
+                                                  width: 8,
                                                 ),
-                                                const Text(
-                                                    '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white)),
-                                              ]),
-                                        ),
-                                      )),
+                                                Text(
+                                                    'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
+                                                    style: const TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white))
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 8,
+                                            ),
+                                            const Text(
+                                                '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white)),
+                                          ]),
                                     ),
                                   )),
                                 );
                               });
 
                           Timer(
-                            const Duration(seconds: 3),
+                            const Duration(seconds: 4),
                             closeInfoModal,
                           );
                         },
@@ -241,10 +228,26 @@ class Mobile extends DocumentSelfieVerificationState {
                 ),
                 Visibility(
                   visible: showID,
-                  child: Positioned(
-                    bottom: 80,
-                    left: width * 0.20,
+                  child: Center(
                     child: loadImage,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32),
+                  child: SizedBox(
+                    width: width,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del documento',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          height: 24 / 18,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 if (showFocusCircle)
