@@ -105,12 +105,13 @@ class Mobile extends DocumentSelfieVerificationState {
                       child: GestureDetector(
                         onTapUp: onTapUp,
                         child: CustomPaint(
-                            painter:
-                                DocumentPainter(Colors.black.withOpacity(0.6)),
-                            size: Size(
-                              double.infinity,
-                              height,
-                            )),
+                          painter:
+                              DocumentPainter(Colors.black.withOpacity(0.6)),
+                          size: Size(
+                            double.infinity,
+                            height,
+                          ),
+                        ),
                       ),
                     ),
                     ColoredBox(
@@ -250,6 +251,49 @@ class Mobile extends DocumentSelfieVerificationState {
                     ),
                   ),
                 ),
+                if (showCameraSelection)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: SizedBox(
+                      width: width,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            ...cameras
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                                  int idx = entry.key;
+                                  CameraDescription description = entry.value;
+
+                                  Widget button = ChipButton(
+                                    label: 'Cámara ${idx + 1}',
+                                    onPressed: () async {
+                                      await initCamera(
+                                          index: idx,
+                                          newCameraDescription: description);
+                                      setState(() {});
+                                    },
+                                    isSelected: idx == cameraIndex,
+                                  );
+
+                                  return [
+                                    button,
+                                    const SizedBox(
+                                      width: 4,
+                                    )
+                                  ];
+                                })
+                                .expand((element) => element)
+                                .toList(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 if (showFocusCircle)
                   Positioned(
                     top: y - 20,
@@ -339,6 +383,39 @@ class Mobile extends DocumentSelfieVerificationState {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class ChipButton extends StatelessWidget {
+  const ChipButton({
+    required this.onPressed,
+    required this.label,
+    this.isSelected = false,
+    super.key,
+  });
+
+  final VoidCallback onPressed;
+  final bool isSelected;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.all<Color>(
+              isSelected ? Colors.blue : Colors.white),
+          backgroundColor: MaterialStateProperty.all<Color>(
+              isSelected ? Colors.white : Colors.transparent),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+            side: BorderSide(color: isSelected ? Colors.blue : Colors.white),
+          ))),
+      child: Text(
+        label,
+      ),
     );
   }
 }

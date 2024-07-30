@@ -10,17 +10,21 @@ abstract class DocumentSelfieVerificationState
   int imageCounter = 0;
   int attempsToSkipValidationCounter = 0;
   int attempsToRotation = 0;
+  int cameraIndex = 0;
   bool showFocusCircle = false;
   bool showButton = false;
   bool showModal = false;
   bool isDispose = false;
   bool isProcessing = false;
+  bool showCameraSelection = false;
   double x = 0;
   double y = 0;
   late Logger logger;
   Timer? timer;
+  Timer? timerToStartImageProcess;
   late CameraDescription cameraDescription;
   late EmojiType emoji;
+  List<CameraDescription> cameras = <CameraDescription>[];
 
   @override
   void initState() {
@@ -38,14 +42,23 @@ abstract class DocumentSelfieVerificationState
     super.initState();
   }
 
-  Future<void> initCamera() async {
-    List<CameraDescription> cameras = await availableCameras();
-
-    int cameraIndex = widget.side.isSelfie ? 1 : 0;
-    if (Platform.isIOS && cameras.length > 3 && !widget.side.isSelfie) {
-      cameraIndex = cameras.length - 1;
+  Future<void> initCamera(
+      {int? index, CameraDescription? newCameraDescription}) async {
+    if (index == null && newCameraDescription == null) {
+      cameras = await availableCameras();
+      cameraIndex = widget.side.isSelfie ? 1 : 0;
+      showCameraSelection =
+          Platform.isIOS && cameras.length > 3 && !widget.side.isSelfie;
+      if (showCameraSelection) {
+        cameras.removeAt(1);
+        cameraIndex = cameras.length - 1;
+      }
+      cameraDescription = cameras[cameraIndex];
+    } else {
+      cameraIndex = index!;
+      cameraDescription = newCameraDescription!;
+      timerToStartImageProcess?.cancel();
     }
-    cameraDescription = cameras[cameraIndex];
 
     controller = CameraController(
       cameraDescription,
@@ -77,12 +90,16 @@ abstract class DocumentSelfieVerificationState
         /* TODO: Ricardo  When the camera starts up it starts dark, 
          after a few frames it converts to a color image
         */
-        Future.delayed(Duration(seconds: widget.seconsToStartImageProcess), () {
-          if (!isDispose) {
-            setTimerToShowButton();
-            startStream(cameraDescription);
-          }
-        });
+
+        timerToStartImageProcess = Timer(
+          Duration(seconds: widget.seconsToStartImageProcess),
+          () {
+            if (!isDispose) {
+              setTimerToShowButton();
+              startStream(cameraDescription);
+            }
+          },
+        );
       }
 
       setState(() {});
@@ -309,6 +326,7 @@ abstract class DocumentSelfieVerificationState
     }
     controller?.dispose();
     timer?.cancel();
+    timerToStartImageProcess?.cancel();
     imageCounter = 0;
   }
 
