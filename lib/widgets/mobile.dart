@@ -9,19 +9,11 @@ class Mobile extends DocumentSelfieVerificationState {
       if (widget.side.isSelfie) {
         return;
       }
-      if (widget.skipValidation) {
+      timer = Timer(const Duration(seconds: 4), () {
         showID = false;
         setState(() {});
-      } else {
-        Timer(const Duration(seconds: 4), () {
-          showID = false;
-          if (mounted) {
-            setState(() {});
-          }
-        });
-      }
+      });
     });
-
     super.initState();
   }
 
@@ -45,9 +37,70 @@ class Mobile extends DocumentSelfieVerificationState {
     );
   }
 
+  void onTapInfo() async {
+    showModal = !showModal;
+    setState(() {});
+
+    showDialog<void>(
+        barrierDismissible: true,
+        useRootNavigator: true,
+        barrierColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return Material(
+            color: Colors.transparent,
+            child: Center(
+                child: DecoratedBox(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black.withOpacity(0.6)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(
+                            Icons.info_outline,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                              'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white))
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      const Text(
+                          '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
+                          style: TextStyle(fontSize: 14, color: Colors.white)),
+                    ]),
+              ),
+            )),
+          );
+        });
+
+    timer = Timer(
+      const Duration(seconds: 4),
+      closeInfoModal,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!(controller?.value.isInitialized ?? false) && !isDispose) {
+    if (!(controller?.value.isInitialized ?? false)) {
       return widget.loadingWidget ??
           const Center(
             child: CircularProgressIndicator(),
@@ -78,7 +131,6 @@ class Mobile extends DocumentSelfieVerificationState {
             size: 24,
           ),
           onPressed: () async {
-            isDispose = true;
             setState(() {});
             if (!widget.side.isSelfie) {
               await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
@@ -120,19 +172,13 @@ class Mobile extends DocumentSelfieVerificationState {
                         width: width * 0.15,
                         height: height,
                         child: Center(
-                          child: Visibility(
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            visible: showButton,
-                            child: InkWell(
-                              onTap: takePhoto,
-                              child: CustomPaint(
-                                painter: CicularButtonPainter(Colors.white),
-                                size: const Size(
-                                  64,
-                                  64,
-                                ),
+                          child: InkWell(
+                            onTap: takePhoto,
+                            child: CustomPaint(
+                              painter: CicularButtonPainter(Colors.white),
+                              size: const Size(
+                                64,
+                                64,
                               ),
                             ),
                           ),
@@ -157,72 +203,7 @@ class Mobile extends DocumentSelfieVerificationState {
                         icon: const Icon(Icons.help_outline_outlined),
                         color:
                             showModal ? const Color(0xff28363e) : Colors.white,
-                        onPressed: () async {
-                          showModal = !showModal;
-                          setState(() {});
-
-                          showDialog<void>(
-                              barrierDismissible: true,
-                              useRootNavigator: true,
-                              barrierColor: Colors.transparent,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Material(
-                                  color: Colors.transparent,
-                                  child: Center(
-                                      child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.black.withOpacity(0.6)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                const Icon(
-                                                  Icons.info_outline,
-                                                  color: Colors.white,
-                                                ),
-                                                const SizedBox(
-                                                  width: 8,
-                                                ),
-                                                Text(
-                                                    'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: Colors.white))
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 8,
-                                            ),
-                                            const Text(
-                                                '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.white)),
-                                          ]),
-                                    ),
-                                  )),
-                                );
-                              });
-
-                          Timer(
-                            const Duration(seconds: 4),
-                            closeInfoModal,
-                          );
-                        },
+                        onPressed: onTapInfo,
                       ),
                     ),
                   ),
@@ -251,49 +232,6 @@ class Mobile extends DocumentSelfieVerificationState {
                     ),
                   ),
                 ),
-                if (showCameraSelection)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 32),
-                    child: SizedBox(
-                      width: width,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            ...cameras
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                                  int idx = entry.key;
-                                  CameraDescription description = entry.value;
-
-                                  Widget button = ChipButton(
-                                    label: 'Cámara ${idx + 1}',
-                                    onPressed: () async {
-                                      await initCamera(
-                                          index: idx,
-                                          newCameraDescription: description);
-                                      setState(() {});
-                                    },
-                                    isSelected: idx == cameraIndex,
-                                  );
-
-                                  return [
-                                    button,
-                                    const SizedBox(
-                                      width: 4,
-                                    )
-                                  ];
-                                })
-                                .expand((element) => element)
-                                .toList(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 if (showFocusCircle)
                   Positioned(
                     top: y - 20,
@@ -345,19 +283,13 @@ class Mobile extends DocumentSelfieVerificationState {
                         const SizedBox(
                           height: 40,
                         ),
-                        Visibility(
-                          maintainSize: true,
-                          maintainAnimation: true,
-                          maintainState: true,
-                          visible: showButton,
-                          child: InkWell(
-                            onTap: takePhoto,
-                            child: CustomPaint(
-                              painter: CicularButtonPainter(Colors.white),
-                              size: const Size(
-                                64,
-                                64,
-                              ),
+                        InkWell(
+                          onTap: takePhoto,
+                          child: CustomPaint(
+                            painter: CicularButtonPainter(Colors.white),
+                            size: const Size(
+                              64,
+                              64,
                             ),
                           ),
                         ),
