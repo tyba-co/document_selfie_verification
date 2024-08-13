@@ -2,6 +2,11 @@ part of document_selfie_verification.widgets;
 
 class Mobile extends DocumentSelfieVerificationState {
   bool showID = true;
+  double _baseScale = 1.0;
+  double minAvailableZoom = 1.0;
+  double maxAvailableZoom = 3.0;
+  // Counting pointers (number of user fingers on screen)
+  int _pointers = 0;
 
   @override
   void initState() {
@@ -98,6 +103,36 @@ class Mobile extends DocumentSelfieVerificationState {
     );
   }
 
+  void _handleScaleStart(ScaleStartDetails details) {
+    _baseScale = _currentScale;
+  }
+
+  Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
+    // When there are not exactly two fingers on screen don't scale
+    if (controller == null || _pointers != 2) {
+      return;
+    }
+
+    _currentScale =
+        (_baseScale * details.scale).clamp(minAvailableZoom, maxAvailableZoom);
+    await controller!.setZoomLevel(_currentScale);
+  }
+
+  void onViewFinderTap(TapDownDetails details, BoxConstraints constraints) {
+    if (controller == null) {
+      return;
+    }
+
+    final CameraController cameraController = controller!;
+
+    final Offset offset = Offset(
+      details.localPosition.dx / constraints.maxWidth,
+      details.localPosition.dy / constraints.maxHeight,
+    );
+    cameraController.setExposurePoint(offset);
+    cameraController.setFocusPoint(offset);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!(controller?.value.isInitialized ?? false)) {
@@ -149,43 +184,58 @@ class Mobile extends DocumentSelfieVerificationState {
                 SizedBox(
                   width: width,
                   height: height,
-                  child: CameraPreview(controller!),
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: GestureDetector(
-                        onTapUp: onTapUp,
-                        child: CustomPaint(
-                          painter:
-                              DocumentPainter(Colors.black.withOpacity(0.6)),
-                          size: Size(
-                            double.infinity,
-                            height,
-                          ),
-                        ),
+                  child: Listener(
+                    onPointerDown: (_) => _pointers++,
+                    onPointerUp: (_) => _pointers--,
+                    child: CameraPreview(
+                      controller!,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onScaleStart: _handleScaleStart,
+                            onScaleUpdate: _handleScaleUpdate,
+                            onTapDown: (TapDownDetails details) =>
+                                onViewFinderTap(details, constraints),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: CustomPaint(
+                                    painter:
+                                        DocumentPainter(Colors.transparent),
+                                    size: Size(
+                                      double.infinity,
+                                      height,
+                                    ),
+                                  ),
+                                ),
+                                ColoredBox(
+                                  color: Colors.transparent,
+                                  child: SizedBox(
+                                    width: width * 0.15,
+                                    height: height,
+                                    child: Center(
+                                      child: InkWell(
+                                        onTap: takePhoto,
+                                        child: CustomPaint(
+                                          painter: CicularButtonPainter(
+                                              Colors.white),
+                                          size: const Size(
+                                            64,
+                                            64,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    ColoredBox(
-                      color: Colors.transparent,
-                      child: SizedBox(
-                        width: width * 0.15,
-                        height: height,
-                        child: Center(
-                          child: InkWell(
-                            onTap: takePhoto,
-                            child: CustomPaint(
-                              painter: CicularButtonPainter(Colors.white),
-                              size: const Size(
-                                64,
-                                64,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
                 Positioned(
                   bottom: 32,
@@ -232,18 +282,6 @@ class Mobile extends DocumentSelfieVerificationState {
                     ),
                   ),
                 ),
-                if (showFocusCircle)
-                  Positioned(
-                    top: y - 20,
-                    left: x - 20,
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1.5)),
-                    ),
-                  ),
               ],
             )
           : Padding(
@@ -255,16 +293,13 @@ class Mobile extends DocumentSelfieVerificationState {
                     height: bodyHeight,
                     child: CameraPreview(controller!),
                   ),
-                  GestureDetector(
-                    onTapUp: onTapUp,
-                    child: CustomPaint(
-                        painter: SelfiePainter(
-                            const Color(0xff28363E).withOpacity(0.6)),
-                        size: Size(
-                          width,
-                          bodyHeight,
-                        )),
-                  ),
+                  CustomPaint(
+                      painter: SelfiePainter(
+                          const Color(0xff28363E).withOpacity(0.6)),
+                      size: Size(
+                        width,
+                        bodyHeight,
+                      )),
                   Positioned.fill(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -299,55 +334,9 @@ class Mobile extends DocumentSelfieVerificationState {
                       ],
                     ),
                   ),
-                  if (showFocusCircle)
-                    Positioned(
-                      top: y - 20,
-                      left: x - 20,
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border:
-                                Border.all(color: Colors.white, width: 1.5)),
-                      ),
-                    ),
                 ],
               ),
             ),
-    );
-  }
-}
-
-class ChipButton extends StatelessWidget {
-  const ChipButton({
-    required this.onPressed,
-    required this.label,
-    this.isSelected = false,
-    super.key,
-  });
-
-  final VoidCallback onPressed;
-  final bool isSelected;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-          foregroundColor: MaterialStateProperty.all<Color>(
-              isSelected ? Colors.blue : Colors.white),
-          backgroundColor: MaterialStateProperty.all<Color>(
-              isSelected ? Colors.white : Colors.transparent),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
-            side: BorderSide(color: isSelected ? Colors.blue : Colors.white),
-          ))),
-      child: Text(
-        label,
-      ),
     );
   }
 }

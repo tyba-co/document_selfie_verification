@@ -9,6 +9,7 @@ abstract class DocumentSelfieVerificationState
   CameraController? controller;
   double x = 0;
   double y = 0;
+  double _currentScale = 1.5;
   int attempsToRotation = 0;
   bool showModal = false;
   bool showFocusCircle = false;
@@ -35,7 +36,8 @@ abstract class DocumentSelfieVerificationState
   Future<void> initCamera() async {
     try {
       List<CameraDescription> cameras = await availableCameras();
-      int cameraIndex = widget.side.isSelfie ? 1 : 0;
+      bool isSelfie = widget.side.isSelfie;
+      int cameraIndex = isSelfie ? 1 : 0;
       CameraDescription cameraDescription = cameras[cameraIndex];
       controller = CameraController(
         cameraDescription,
@@ -51,8 +53,13 @@ abstract class DocumentSelfieVerificationState
         return;
       }
       await rotateCamera(controller!);
+
       unawaited(controller?.setFlashMode(FlashMode.off));
       unawaited(controller?.setFocusMode(FocusMode.auto));
+      if (!isSelfie) {
+        unawaited(controller?.setZoomLevel(_currentScale));
+      }
+
       setState(() {});
     } catch (error) {
       widget.onError?.call(error);
@@ -93,35 +100,6 @@ abstract class DocumentSelfieVerificationState
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
-  }
-
-  Future<void> onTapUp(TapUpDetails details) async {
-    try {
-      showFocusCircle = true;
-      x = details.localPosition.dx;
-      y = details.localPosition.dy;
-
-      double fullWidth = MediaQuery.of(context).size.width;
-      double cameraHeight = fullWidth * controller!.value.aspectRatio;
-
-      double xp = x / fullWidth;
-      double yp = y / cameraHeight;
-
-      Offset point = Offset(xp, yp);
-
-      await controller?.setExposurePoint(point);
-      await controller?.setFocusPoint(point);
-      setState(() {
-        Future.delayed(const Duration(seconds: 1)).whenComplete(() {
-          setState(() {
-            showFocusCircle = false;
-          });
-        });
-      });
-    } on Exception catch (_, __) {
-      showFocusCircle = false;
-      setState(() {});
-    }
   }
 
   Future<void> takePhoto() async {

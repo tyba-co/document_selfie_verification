@@ -10,7 +10,7 @@ Future<void> main() async {
 
   await setPortrait();
   runApp(const MaterialApp(
-    showPerformanceOverlay: true,
+    showPerformanceOverlay: false,
     home: ExampleWidget(),
   ));
 }
@@ -126,7 +126,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     }
 
     return DocumentSelfieVerification(
-        side: SideType.selfie,
+        side: SideType.frontSide,
         country: CountryType.colombia,
         onTakePhoto: (File response) {
           imageToShow = Image.file(response);
