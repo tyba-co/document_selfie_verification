@@ -14,7 +14,7 @@ class DocumentSelfieVerification extends StatefulWidget {
   final void Function()? onPressBackButton;
   final Widget? loadingWidget;
   final CountryType country;
-  final void Function(File response) onTakePhoto;
+  final void Function(File response, EmojiType? emoji) onTakePhoto;
   final void Function(dynamic error)? onError;
 
   @override

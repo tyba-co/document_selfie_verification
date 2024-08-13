@@ -128,7 +128,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
     return DocumentSelfieVerification(
         side: SideType.frontSide,
         country: CountryType.colombia,
-        onTakePhoto: (File response) {
+        onTakePhoto: (File response, EmojiType? emoji) {
           imageToShow = Image.file(response);
           setState(() {});
         });

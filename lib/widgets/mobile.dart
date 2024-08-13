@@ -306,7 +306,7 @@ class Mobile extends DocumentSelfieVerificationState {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Text(
-                          'Pon cara de ${emoji.label}',
+                          'Pon cara de ${emoji?.label}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,

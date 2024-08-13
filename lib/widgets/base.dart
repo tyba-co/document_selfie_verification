@@ -14,13 +14,16 @@ abstract class DocumentSelfieVerificationState
   bool showModal = false;
   bool showFocusCircle = false;
   late Logger logger;
-  late EmojiType emoji;
+  EmojiType? emoji;
   Timer? timer;
 
   @override
   void initState() {
     logger = Logger();
-    emoji = EmojiType.randomEmoji();
+    if (widget.side.isSelfie) {
+      emoji = EmojiType.randomEmoji();
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       unawaited(
         SystemChrome.setEnabledSystemUIMode(
@@ -121,7 +124,10 @@ abstract class DocumentSelfieVerificationState
           DeviceOrientation.portraitUp,
         ]);
       }
-      widget.onTakePhoto(file);
+      widget.onTakePhoto(
+        file,
+        emoji,
+      );
     } catch (error) {
       widget.onError?.call(error);
     }
