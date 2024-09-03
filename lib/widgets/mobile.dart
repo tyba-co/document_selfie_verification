@@ -52,48 +52,55 @@ class Mobile extends DocumentSelfieVerificationState {
         barrierColor: Colors.transparent,
         context: context,
         builder: (BuildContext context) {
-          return Material(
-            color: Colors.transparent,
-            child: Center(
-                child: DecoratedBox(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.black.withOpacity(0.6)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Icon(
-                            Icons.info_outline,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                              'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
-                              style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white))
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
-                      const Text(
-                          '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
-                          style: TextStyle(fontSize: 14, color: Colors.white)),
-                    ]),
-              ),
-            )),
+          return GestureDetector(
+            onTap: () {
+              timer?.cancel();
+              closeInfoModal();
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: Center(
+                  child: DecoratedBox(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.black.withOpacity(0.6)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            const Icon(
+                              Icons.info_outline,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                                'Cara ${widget.side == SideType.frontSide ? 'frontal' : 'posterior'} del\ndocumento',
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white))
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        const Text(
+                            '• Ubica tu documento de identidad\n completo dentro del marco.\n• Usa buena iluminación, evita reflejos\n y texturas en el fondo.\n• Asegúrate que el rostro y los datos\n son legibles.',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.white)),
+                      ]),
+                ),
+              )),
+            ),
           );
         });
 
@@ -153,6 +160,7 @@ class Mobile extends DocumentSelfieVerificationState {
     double marginBottom = padding.bottom + 42;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: !widget.side.isSelfie

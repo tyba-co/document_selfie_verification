@@ -19,13 +19,6 @@ abstract class DocumentSelfieVerificationState
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final CameraController? cameraController = controller;
-
-    // App state changed before we got the chance to initialize.
-    if (cameraController == null || !cameraController.value.isInitialized) {
-      return;
-    }
-
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused) {
       close();
@@ -56,6 +49,10 @@ abstract class DocumentSelfieVerificationState
 
   Future<void> initCamera() async {
     try {
+      bool isInitialized = controller?.value.isInitialized ?? false;
+      if (isInitialized) {
+        return;
+      }
       List<CameraDescription> cameras = await availableCameras();
       bool isSelfie = widget.side.isSelfie;
       int cameraIndex = isSelfie ? 1 : 0;
@@ -108,11 +105,13 @@ abstract class DocumentSelfieVerificationState
       controller!.stopImageStream();
     }
     controller?.dispose();
+    controller = null;
     timer?.cancel();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     close();
     super.dispose();
   }
