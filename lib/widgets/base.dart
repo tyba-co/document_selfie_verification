@@ -1,7 +1,7 @@
 part of document_selfie_verification.widgets;
 
 abstract class DocumentSelfieVerificationState
-    extends State<DocumentSelfieVerification> {
+    extends State<DocumentSelfieVerification> with WidgetsBindingObserver {
   DocumentSelfieVerificationState();
   factory DocumentSelfieVerificationState.fromPlatform() =>
       kIsWeb ? Web() : Mobile();
@@ -18,7 +18,25 @@ abstract class DocumentSelfieVerificationState
   Timer? timer;
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? cameraController = controller;
+
+    // App state changed before we got the chance to initialize.
+    if (cameraController == null || !cameraController.value.isInitialized) {
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      close();
+    } else if (state == AppLifecycleState.resumed) {
+      initCamera();
+    }
+  }
+
+  @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     logger = Logger();
     if (widget.side.isSelfie) {
       emoji = EmojiType.randomEmoji();
