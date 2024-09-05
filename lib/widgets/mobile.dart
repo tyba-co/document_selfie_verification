@@ -1,26 +1,11 @@
 part of document_selfie_verification.widgets;
 
 class Mobile extends DocumentSelfieVerificationState {
-  bool showID = true;
   double _baseScale = 1.0;
   double minAvailableZoom = 1.0;
   double maxAvailableZoom = 3.0;
   // Counting pointers (number of user fingers on screen)
   int _pointers = 0;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.side.isSelfie) {
-        return;
-      }
-      timer = Timer(const Duration(seconds: 4), () {
-        showID = false;
-        setState(() {});
-      });
-    });
-    super.initState();
-  }
 
   Widget get loadImage {
     String backImage = 'assets/id_ghost_back.svg';

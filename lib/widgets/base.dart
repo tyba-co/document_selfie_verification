@@ -13,9 +13,17 @@ abstract class DocumentSelfieVerificationState
   int attempsToRotation = 0;
   bool showModal = false;
   bool showFocusCircle = false;
+  bool showID = true;
   late Logger logger;
   EmojiType? emoji;
   Timer? timer;
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -34,7 +42,6 @@ abstract class DocumentSelfieVerificationState
     if (widget.side.isSelfie) {
       emoji = EmojiType.randomEmoji();
     }
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       unawaited(
         SystemChrome.setEnabledSystemUIMode(
@@ -43,8 +50,19 @@ abstract class DocumentSelfieVerificationState
         ),
       );
       await initCamera();
+      initPlaceholderTimer();
     });
     super.initState();
+  }
+
+  initPlaceholderTimer() {
+    if (widget.side.isSelfie) {
+      return;
+    }
+    timer = Timer(const Duration(seconds: 4), () {
+      showID = false;
+      setState(() {});
+    });
   }
 
   Future<void> initCamera() async {
@@ -106,6 +124,7 @@ abstract class DocumentSelfieVerificationState
     }
     controller?.dispose();
     controller = null;
+    showID = false;
     timer?.cancel();
   }
 
@@ -114,12 +133,6 @@ abstract class DocumentSelfieVerificationState
     WidgetsBinding.instance.removeObserver(this);
     close();
     super.dispose();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   Future<void> takePhoto() async {
