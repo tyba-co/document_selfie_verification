@@ -37,18 +37,18 @@ packages:
     dependency: transitive
     description:
       name: camera
-      sha256: dfa8fc5a1adaeb95e7a54d86a5bd56f4bb0e035515354c8ac6d262e35cec2ec8
+      sha256: "26ff41045772153f222ffffecba711a206f670f5834d40ebf5eed3811692f167"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.6"
-  camera_android:
+    version: "0.11.0+2"
+  camera_android_camerax:
     dependency: transitive
     description:
-      name: camera_android
-      sha256: b350ac087f111467e705b2b76cc1322f7f5bdc122aa83b4b243b0872f390d229
+      name: camera_android_camerax
+      sha256: "59967e6d80df9d682a33b86f228cc524e6b52d6184b84f6ac62151dd98bd1ea0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.9+2"
+    version: "0.6.5+2"
   camera_avfoundation:
     dependency: transitive
     description:
@@ -135,7 +135,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.38"
+    version: "0.0.41"
   fake_async:
     dependency: transitive
     description:
