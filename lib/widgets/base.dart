@@ -89,8 +89,10 @@ abstract class DocumentSelfieVerificationState
         return;
       }
       await rotateCamera(controller!);
-
-      unawaited(controller?.setFlashMode(FlashMode.off));
+      bool isTorchAvailable = await TorchLight.isTorchAvailable();
+      if (isTorchAvailable) {
+        unawaited(controller?.setFlashMode(FlashMode.off));
+      }
       unawaited(controller?.setFocusMode(FocusMode.auto));
       if (!isSelfie) {
         unawaited(controller?.setZoomLevel(_currentScale));
